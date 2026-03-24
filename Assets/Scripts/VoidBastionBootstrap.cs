@@ -639,7 +639,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var resourceObject = GameObject.CreatePrimitive(primitiveType);
         resourceObject.name = type + " Node";
         resourceObject.transform.SetParent(worldRoot);
-        resourceObject.transform.position = new Vector3(Random.Range(minX, maxX), 1.2f, Random.Range(-9f, 9f));
+        resourceObject.transform.position = new Vector3(Random.Range(minX, maxX), 1.4f, Random.Range(-9f, 9f));
         resourceObject.transform.localScale = Vector3.one * Random.Range(0.7f, 1.15f);
         resourceObject.GetComponent<Renderer>().material.color = color;
 
