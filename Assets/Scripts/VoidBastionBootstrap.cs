@@ -12,6 +12,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float SprintDuration = 1.5f;
     private const float SprintCooldown = 5f;
     private const float WaveBreakDuration = 30f;
+    private const float ResourceRespawnInterval = 2.5f;
     private const int TotalWaves = 15;
 
     private static readonly Vector3 CastlePosition = new Vector3(1.5f, 0f, 0f);
@@ -72,6 +73,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private float castleCooldown = 0.85f;
     private float nextSpawnTimer;
     private float waveBreakTimer = 3f;
+    private float resourceRespawnTimer;
     private Vector3 holeTarget;
     private ToggleableButton soundToggle;
 
@@ -110,6 +112,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         UpdateHoleMovement();
         UpdateSprintState();
         UpdateAbsorption();
+        UpdateResourceRespawn();
         UpdateWaveLoop();
         UpdateEnemies();
         UpdateDefenses();
@@ -246,6 +249,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         castleCooldown = 0.85f;
         nextSpawnTimer = 0f;
         waveBreakTimer = 3f;
+        resourceRespawnTimer = ResourceRespawnInterval;
 
         resources[ResourceType.Wood] = 0;
         resources[ResourceType.Stone] = 0;
@@ -377,28 +381,16 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private void SpawnResources()
     {
-        SpawnResourceStrip(ResourceType.Wood, PrimitiveType.Capsule, new Color(0.24f, 0.52f, 0.18f), 10, 7.5f, 13f);
-        SpawnResourceStrip(ResourceType.Stone, PrimitiveType.Cube, new Color(0.56f, 0.58f, 0.62f), 8, 8.5f, 14f);
-        SpawnResourceStrip(ResourceType.Iron, PrimitiveType.Sphere, new Color(0.5f, 0.42f, 0.26f), 6, 10f, 14f);
+        SpawnResourceStrip(ResourceType.Wood, 10);
+        SpawnResourceStrip(ResourceType.Stone, 8);
+        SpawnResourceStrip(ResourceType.Iron, 6);
     }
 
-    private void SpawnResourceStrip(ResourceType type, PrimitiveType primitiveType, Color color, int count, float minX, float maxX)
+    private void SpawnResourceStrip(ResourceType type, int count)
     {
         for (int index = 0; index < count; index++)
         {
-            var resourceObject = GameObject.CreatePrimitive(primitiveType);
-            resourceObject.name = type + " Node";
-            resourceObject.transform.SetParent(worldRoot);
-            resourceObject.transform.position = new Vector3(Random.Range(minX, maxX), 0.4f, Random.Range(-9f, 9f));
-            resourceObject.transform.localScale = Vector3.one * Random.Range(0.7f, 1.15f);
-            resourceObject.GetComponent<Renderer>().material.color = color;
-
-            resourceNodes.Add(new ResourceNode
-            {
-                ResourceType = type,
-                Amount = type == ResourceType.Iron ? 3 : 5,
-                Transform = resourceObject.transform
-            });
+            SpawnSingleResource(type);
         }
     }
 
@@ -517,6 +509,101 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
                 node.Transform.position += direction.normalized * Time.deltaTime * 3.5f;
             }
         }
+    }
+
+    private void UpdateResourceRespawn()
+    {
+        resourceRespawnTimer -= Time.deltaTime;
+        if (resourceRespawnTimer > 0f)
+        {
+            return;
+        }
+
+        resourceRespawnTimer = ResourceRespawnInterval;
+        TryRespawnResource(ResourceType.Wood);
+        TryRespawnResource(ResourceType.Stone);
+        TryRespawnResource(ResourceType.Iron);
+    }
+
+    private void TryRespawnResource(ResourceType type)
+    {
+        if (CountResources(type) >= GetTargetResourceCount(type))
+        {
+            return;
+        }
+
+        SpawnSingleResource(type);
+    }
+
+    private int CountResources(ResourceType type)
+    {
+        var count = 0;
+        for (int index = 0; index < resourceNodes.Count; index++)
+        {
+            if (resourceNodes[index].Transform != null && resourceNodes[index].ResourceType == type)
+            {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    private int GetTargetResourceCount(ResourceType type)
+    {
+        switch (type)
+        {
+            case ResourceType.Wood:
+                return 10;
+            case ResourceType.Stone:
+                return 8;
+            default:
+                return 6;
+        }
+    }
+
+    private void SpawnSingleResource(ResourceType type)
+    {
+        PrimitiveType primitiveType;
+        Color color;
+        float minX;
+        float maxX;
+
+        switch (type)
+        {
+            case ResourceType.Wood:
+                primitiveType = PrimitiveType.Capsule;
+                color = new Color(0.24f, 0.52f, 0.18f);
+                minX = 7.5f;
+                maxX = 13f;
+                break;
+            case ResourceType.Stone:
+                primitiveType = PrimitiveType.Cube;
+                color = new Color(0.56f, 0.58f, 0.62f);
+                minX = 8.5f;
+                maxX = 14f;
+                break;
+            default:
+                primitiveType = PrimitiveType.Sphere;
+                color = new Color(0.5f, 0.42f, 0.26f);
+                minX = 10f;
+                maxX = 14f;
+                break;
+        }
+
+        var resourceObject = GameObject.CreatePrimitive(primitiveType);
+        resourceObject.name = type + " Node";
+        resourceObject.transform.SetParent(worldRoot);
+        resourceObject.transform.position = new Vector3(Random.Range(minX, maxX), 0.4f, Random.Range(-9f, 9f));
+        resourceObject.transform.localScale = Vector3.one * Random.Range(0.7f, 1.15f);
+        resourceObject.GetComponent<Renderer>().material.color = color;
+
+        resourceNodes.Add(new ResourceNode
+        {
+            ResourceType = type,
+            Amount = type == ResourceType.Iron ? 3 : 5,
+            Transform = resourceObject.transform
+        });
     }
 
     private void UpdateUpgradePanel()
