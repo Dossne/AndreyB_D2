@@ -1138,10 +1138,20 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         image.color = color;
 
         var rectTransform = panelObject.GetComponent<RectTransform>();
-        rectTransform.anchorMin = anchor;
-        rectTransform.anchorMax = anchor;
-        rectTransform.sizeDelta = size;
-        rectTransform.anchoredPosition = Vector2.zero;
+        if (size == Vector2.zero)
+        {
+            rectTransform.anchorMin = Vector2.zero;
+            rectTransform.anchorMax = Vector2.one;
+            rectTransform.offsetMin = Vector2.zero;
+            rectTransform.offsetMax = Vector2.zero;
+        }
+        else
+        {
+            rectTransform.anchorMin = anchor;
+            rectTransform.anchorMax = anchor;
+            rectTransform.sizeDelta = size;
+            rectTransform.anchoredPosition = Vector2.zero;
+        }
         return panelObject;
     }
 
