@@ -755,10 +755,10 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var towerCost = GetTowerBuildCost();
         castleUpgradeButtonText.text = "Castle +" + (castleUpgradeLevel + 1) + "\n" + FormatCost(castleCost);
         holeUpgradeButtonText.text = "Hole +" + (holeUpgradeLevel + 1) + "\n" + FormatCost(holeCost);
-        towerBuildButtonText.text = builtTowerCount >= 3 ? "Towers Full" : "Build Tower\n" + FormatCost(towerCost);
+        towerBuildButtonText.text = builtTowerCount >= 6 ? "Towers Full" : "Build Tower\n" + FormatCost(towerCost);
         castleUpgradeButton.interactable = HasResources(castleCost);
         holeUpgradeButton.interactable = HasResources(holeCost);
-        towerBuildButton.interactable = builtTowerCount < 3 && HasResources(towerCost);
+        towerBuildButton.interactable = builtTowerCount < 6 && HasResources(towerCost);
     }
 
     private void SetSprintVisibility(bool isVisible)
@@ -1034,7 +1034,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private void BuildTower()
     {
-        if (builtTowerCount >= 3)
+        if (builtTowerCount >= 6)
         {
             return;
         }
@@ -1050,7 +1050,10 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         {
             new Vector3(-10.5f, 0.6f, -0.5f),
             new Vector3(-6.5f, 0.6f, 6f),
-            new Vector3(-0.5f, 0.6f, -3.5f)
+            new Vector3(-18.5f, 0.6f, -12f),
+            new Vector3(-15.5f, 0.6f, -3f),
+            new Vector3(-8f, 0.6f, 8.5f),
+            new Vector3(-3f, 0.6f, 5.5f)
         };
 
         var towerObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
