@@ -326,7 +326,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var mountainSegments = new List<MountainData>();
         var minZ = -MapHeight * 0.5f + 1.5f;
         var maxZ = MapHeight * 0.5f - 1.5f;
-        var segmentSpacing = 3f;
+        var segmentSpacing = 2f;
         var mountainMesh = CreateHexPyramidMesh();
 
         for (var z = minZ; z <= maxZ; z += segmentSpacing)
