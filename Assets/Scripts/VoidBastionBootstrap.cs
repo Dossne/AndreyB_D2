@@ -54,9 +54,13 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private Button castleUpgradeButton;
     private Button holeUpgradeButton;
     private Button towerBuildButton;
+    private Button arrowTowerSelectButton;
+    private Button cannonTowerSelectButton;
     private Text castleUpgradeButtonText;
     private Text holeUpgradeButtonText;
     private Text towerBuildButtonText;
+    private Text arrowTowerSelectButtonText;
+    private Text cannonTowerSelectButtonText;
 
     private bool soundEnabled = true;
     private bool gameStarted;
@@ -71,6 +75,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private int castleUpgradeLevel;
     private int holeUpgradeLevel;
     private int builtTowerCount;
+    private TowerBuildType selectedTowerType = TowerBuildType.Arrow;
     private float holeRadius = 1.2f;
     private float holeSpeed = 4.5f;
     private float currentSprintTime;
@@ -201,12 +206,18 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         castleUpgradeButton = CreateButton(upgradePanel.transform, "Castle Upgrade", new Vector2(0.2f, 0.5f), new Vector2(250f, 94f));
         holeUpgradeButton = CreateButton(upgradePanel.transform, "Hole Upgrade", new Vector2(0.5f, 0.5f), new Vector2(250f, 94f));
         towerBuildButton = CreateButton(upgradePanel.transform, "Build Tower", new Vector2(0.8f, 0.5f), new Vector2(250f, 94f));
+        arrowTowerSelectButton = CreateButton(upgradePanel.transform, "Arrow", new Vector2(0.68f, 0.88f), new Vector2(140f, 58f));
+        cannonTowerSelectButton = CreateButton(upgradePanel.transform, "Cannon", new Vector2(0.9f, 0.88f), new Vector2(140f, 58f));
         castleUpgradeButton.onClick.AddListener(UpgradeCastle);
         holeUpgradeButton.onClick.AddListener(UpgradeHole);
         towerBuildButton.onClick.AddListener(BuildTower);
+        arrowTowerSelectButton.onClick.AddListener(() => SelectTowerType(TowerBuildType.Arrow));
+        cannonTowerSelectButton.onClick.AddListener(() => SelectTowerType(TowerBuildType.Cannon));
         castleUpgradeButtonText = castleUpgradeButton.GetComponentInChildren<Text>();
         holeUpgradeButtonText = holeUpgradeButton.GetComponentInChildren<Text>();
         towerBuildButtonText = towerBuildButton.GetComponentInChildren<Text>();
+        arrowTowerSelectButtonText = arrowTowerSelectButton.GetComponentInChildren<Text>();
+        cannonTowerSelectButtonText = cannonTowerSelectButton.GetComponentInChildren<Text>();
 
         endPanel = CreatePanel("End Panel", new Vector2(0.5f, 0.5f), new Vector2(720f, 620f), new Color(0.05f, 0.08f, 0.12f, 0.9f));
         endTitleText = CreateText(endPanel.transform, string.Empty, 68, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.72f), new Vector2(520f, 100f));
@@ -798,13 +809,44 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
         var castleCost = GetCastleUpgradeCost();
         var holeCost = GetHoleUpgradeCost();
-        var towerCost = GetTowerBuildCost();
+        var towerCost = GetTowerBuildCost(selectedTowerType);
         castleUpgradeButtonText.text = "Castle +" + (castleUpgradeLevel + 1) + "\n" + FormatCost(castleCost);
         holeUpgradeButtonText.text = "Hole +" + (holeUpgradeLevel + 1) + "\n" + FormatCost(holeCost);
-        towerBuildButtonText.text = builtTowerCount >= 6 ? "Towers Full" : "Build Tower\n" + FormatCost(towerCost);
+        towerBuildButtonText.text = builtTowerCount >= 6
+            ? "Towers Full"
+            : selectedTowerType + "\n" + FormatCost(towerCost);
         castleUpgradeButton.interactable = HasResources(castleCost);
         holeUpgradeButton.interactable = HasResources(holeCost);
         towerBuildButton.interactable = builtTowerCount < 6 && HasResources(towerCost);
+        UpdateTowerSelectionButtons();
+    }
+
+    private void UpdateTowerSelectionButtons()
+    {
+        SetTowerSelectionVisual(arrowTowerSelectButton, arrowTowerSelectButtonText, selectedTowerType == TowerBuildType.Arrow);
+        SetTowerSelectionVisual(cannonTowerSelectButton, cannonTowerSelectButtonText, selectedTowerType == TowerBuildType.Cannon);
+    }
+
+    private void SetTowerSelectionVisual(Button button, Text label, bool selected)
+    {
+        var image = button.GetComponent<Image>();
+        if (image != null)
+        {
+            image.color = selected
+                ? new Color(0.98f, 0.86f, 0.36f, 1f)
+                : new Color(0.72f, 0.66f, 0.48f, 0.95f);
+        }
+
+        if (label != null)
+        {
+            label.color = selected ? new Color(0.1f, 0.08f, 0.04f) : new Color(0.2f, 0.16f, 0.1f);
+        }
+    }
+
+    private void SelectTowerType(TowerBuildType towerType)
+    {
+        selectedTowerType = towerType;
+        UpdateTowerSelectionButtons();
     }
 
     private void SetSprintVisibility(bool isVisible)
@@ -1089,7 +1131,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             return;
         }
 
-        var cost = GetTowerBuildCost();
+        var cost = GetTowerBuildCost(selectedTowerType);
         if (!HasResources(cost))
         {
             return;
@@ -1111,16 +1153,33 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         towerObject.transform.SetParent(worldRoot);
         towerObject.transform.position = towerPositions[builtTowerCount];
         towerObject.transform.localScale = new Vector3(0.9f, 1.1f, 0.9f);
-        towerObject.GetComponent<Renderer>().material.color = new Color(0.58f, 0.68f, 0.82f);
+        var towerRenderer = towerObject.GetComponent<Renderer>();
 
-        turrets.Add(new DefenseTurret
+        if (selectedTowerType == TowerBuildType.Arrow)
         {
-            Transform = towerObject.transform,
-            Range = 6.4f,
-            Damage = 1.6f + builtTowerCount * 0.4f,
-            Cooldown = 0.7f,
-            VisualColor = new Color(0.55f, 0.9f, 1f)
-        });
+            towerRenderer.material.color = new Color(0.58f, 0.68f, 0.82f);
+            turrets.Add(new DefenseTurret
+            {
+                Transform = towerObject.transform,
+                Range = 6.4f,
+                Damage = 1.6f + builtTowerCount * 0.4f,
+                Cooldown = 0.7f,
+                VisualColor = new Color(0.55f, 0.9f, 1f)
+            });
+        }
+        else
+        {
+            towerRenderer.material.color = new Color(0.62f, 0.46f, 0.34f);
+            towerObject.transform.localScale = new Vector3(1.1f, 1.2f, 1.1f);
+            turrets.Add(new DefenseTurret
+            {
+                Transform = towerObject.transform,
+                Range = 7.4f,
+                Damage = 3.6f + builtTowerCount * 0.55f,
+                Cooldown = 1.15f,
+                VisualColor = new Color(1f, 0.7f, 0.38f)
+            });
+        }
 
         builtTowerCount++;
     }
@@ -1284,8 +1343,13 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         return new ResourceCost(18 + holeUpgradeLevel * 8, 10 + holeUpgradeLevel * 6, 4 + holeUpgradeLevel * 2);
     }
 
-    private ResourceCost GetTowerBuildCost()
+    private ResourceCost GetTowerBuildCost(TowerBuildType towerType)
     {
+        if (towerType == TowerBuildType.Cannon)
+        {
+            return new ResourceCost(32 + builtTowerCount * 7, 28 + builtTowerCount * 6, 12 + builtTowerCount * 4);
+        }
+
         return new ResourceCost(24 + builtTowerCount * 6, 20 + builtTowerCount * 5, 8 + builtTowerCount * 3);
     }
 
@@ -1474,6 +1538,12 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     {
         public Button Button;
         public Text Label;
+    }
+
+    private enum TowerBuildType
+    {
+        Arrow,
+        Cannon
     }
 
     private enum ResourceType
