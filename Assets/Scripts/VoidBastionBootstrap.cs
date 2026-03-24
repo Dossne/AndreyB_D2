@@ -1063,7 +1063,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var textObject = new GameObject("Text");
         textObject.transform.SetParent(parent, false);
         var text = textObject.AddComponent<Text>();
-        text.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
         text.text = content;
         text.fontSize = fontSize;
         text.alignment = alignment;
