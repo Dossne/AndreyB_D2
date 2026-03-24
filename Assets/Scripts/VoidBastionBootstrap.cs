@@ -15,10 +15,11 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float ResourceRespawnInterval = 2.5f;
     private const float CameraFollowHeight = 12f;
     private const float CameraFollowDepthOffset = -12f;
+    private const float HoleCenterY = -0.23f;
     private const int TotalWaves = 15;
 
     private static readonly Vector3 CastlePosition = new Vector3(1.5f, 0f, 0f);
-    private static readonly Vector3 HoleStartPosition = new Vector3(4.5f, 0.15f, -1.5f);
+    private static readonly Vector3 HoleStartPosition = new Vector3(4.5f, HoleCenterY, -1.5f);
 
     private readonly Dictionary<ResourceType, int> resources = new Dictionary<ResourceType, int>();
     private readonly List<ResourceNode> resourceNodes = new List<ResourceNode>();
@@ -1160,7 +1161,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         if (plane.Raycast(ray, out var enter))
         {
             worldPoint = ray.GetPoint(enter);
-            worldPoint.y = holeTransform != null ? holeTransform.position.y : 0.15f;
+            worldPoint.y = holeTransform != null ? holeTransform.position.y : HoleCenterY;
             return true;
         }
 
