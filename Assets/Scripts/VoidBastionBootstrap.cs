@@ -1099,7 +1099,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var towerPositions = new[]
         {
             new Vector3(-10.5f, 0.6f, -0.5f),
-            new Vector3(-6.5f, 0.6f, 6f),
+            new Vector3(-9.5f, 0.6f, 9f),
             new Vector3(-18.5f, 0.6f, -12f),
             new Vector3(-15.5f, 0.6f, -3f),
             new Vector3(-8f, 0.6f, 8.5f),
