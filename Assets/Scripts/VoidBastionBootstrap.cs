@@ -504,6 +504,15 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
             if (distance <= holeRadius + 0.35f)
             {
+                var rigidbody = node.Transform.GetComponent<Rigidbody>();
+                if (rigidbody != null)
+                {
+                    rigidbody.isKinematic = true;
+                    rigidbody.useGravity = false;
+                    rigidbody.velocity = Vector3.zero;
+                    rigidbody.angularVelocity = Vector3.zero;
+                }
+
                 fallingResources.Add(new FallingResource
                 {
                     Transform = node.Transform,
@@ -630,9 +639,15 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var resourceObject = GameObject.CreatePrimitive(primitiveType);
         resourceObject.name = type + " Node";
         resourceObject.transform.SetParent(worldRoot);
-        resourceObject.transform.position = new Vector3(Random.Range(minX, maxX), 0.4f, Random.Range(-9f, 9f));
+        resourceObject.transform.position = new Vector3(Random.Range(minX, maxX), 1.2f, Random.Range(-9f, 9f));
         resourceObject.transform.localScale = Vector3.one * Random.Range(0.7f, 1.15f);
         resourceObject.GetComponent<Renderer>().material.color = color;
+
+        var rigidbody = resourceObject.AddComponent<Rigidbody>();
+        rigidbody.mass = 0.35f;
+        rigidbody.drag = 1.5f;
+        rigidbody.angularDrag = 3f;
+        rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
 
         resourceNodes.Add(new ResourceNode
         {
