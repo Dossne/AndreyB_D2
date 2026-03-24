@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 public sealed class VoidBastionBootstrap : MonoBehaviour
 {
-    private const float MapWidth = 30f;
-    private const float MapHeight = 22f;
+    private const float MapWidth = 60f;
+    private const float MapHeight = 44f;
     private const float CastleZoneRadius = 3.25f;
     private const float SprintDuration = 1.5f;
     private const float SprintCooldown = 5f;
