@@ -1048,9 +1048,9 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         SpendResources(cost);
         var towerPositions = new[]
         {
-            CastlePosition + new Vector3(-2.6f, 0.6f, -2.2f),
-            CastlePosition + new Vector3(-2.9f, 0.6f, 2.5f),
-            CastlePosition + new Vector3(0.6f, 0.6f, -3.2f)
+            new Vector3(-10.5f, 0.6f, -0.5f),
+            new Vector3(-6.5f, 0.6f, 6f),
+            new Vector3(-0.5f, 0.6f, -3.5f)
         };
 
         var towerObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
