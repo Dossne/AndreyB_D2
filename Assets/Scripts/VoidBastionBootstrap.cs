@@ -13,6 +13,8 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float SprintCooldown = 5f;
     private const float WaveBreakDuration = 30f;
     private const float ResourceRespawnInterval = 2.5f;
+    private const float CameraFollowHeight = 12f;
+    private const float CameraFollowDepthOffset = -12f;
     private const int TotalWaves = 15;
 
     private static readonly Vector3 CastlePosition = new Vector3(1.5f, 0f, 0f);
@@ -110,6 +112,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
         HandlePointerInput();
         UpdateHoleMovement();
+        UpdateCameraFollow();
         UpdateSprintState();
         UpdateAbsorption();
         UpdateResourceRespawn();
@@ -132,10 +135,10 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             cameraObject.AddComponent<AudioListener>();
         }
 
-        mainCamera.orthographic = true;
-        mainCamera.orthographicSize = 11f;
-        mainCamera.transform.position = new Vector3(1.5f, 18f, -0.5f);
-        mainCamera.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+        mainCamera.orthographic = false;
+        mainCamera.fieldOfView = 60f;
+        mainCamera.transform.position = new Vector3(CastlePosition.x, CameraFollowHeight, CameraFollowDepthOffset);
+        mainCamera.transform.rotation = Quaternion.Euler(45f, 0f, 0f);
         mainCamera.backgroundColor = new Color(0.72f, 0.88f, 0.96f);
         mainCamera.clearFlags = CameraClearFlags.SolidColor;
     }
@@ -377,6 +380,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         holeTransform = holeObject.transform;
         holeTarget = holeTransform.position;
         UpdateHoleVisual();
+        UpdateCameraFollow();
     }
 
     private void SpawnResources()
@@ -678,6 +682,19 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private void UpdateHoleVisual()
     {
         holeTransform.localScale = new Vector3(holeRadius * 2f, 0.18f, holeRadius * 2f);
+    }
+
+    private void UpdateCameraFollow()
+    {
+        if (mainCamera == null || holeTransform == null)
+        {
+            return;
+        }
+
+        mainCamera.transform.position = new Vector3(
+            holeTransform.position.x,
+            holeTransform.position.y + CameraFollowHeight,
+            holeTransform.position.z + CameraFollowDepthOffset);
     }
 
     private void UpdateWaveLoop()
