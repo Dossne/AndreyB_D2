@@ -9,6 +9,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float MapWidth = 60f;
     private const float MapHeight = 44f;
     private const float CastleZoneRadius = 3.25f;
+    private const float UpgradeZoneRadius = 3.5f;
     private const float SprintDuration = 1.5f;
     private const float SprintCooldown = 5f;
     private const float WaveBreakDuration = 30f;
@@ -22,6 +23,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const int TotalWaves = 15;
 
     private static readonly Vector3 CastlePosition = new Vector3(1.5f, 0f, 0f);
+    private static readonly Vector3 UpgradeZonePosition = new Vector3(12.5f, 0f, 0f);
     private static readonly Vector3 HoleStartPosition = new Vector3(11.5f, HoleCenterY, -1.5f);
 
     private readonly Dictionary<ResourceType, int> resources = new Dictionary<ResourceType, int>();
@@ -411,6 +413,14 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         zoneObject.GetComponent<Renderer>().material.color = new Color(0.3f, 0.52f, 0.34f, 0.35f);
         Destroy(zoneObject.GetComponent<Collider>());
 
+        var upgradeZoneObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        upgradeZoneObject.name = "Upgrade Zone";
+        upgradeZoneObject.transform.SetParent(worldRoot);
+        upgradeZoneObject.transform.position = UpgradeZonePosition + new Vector3(0f, 0.01f, 0f);
+        upgradeZoneObject.transform.localScale = new Vector3(UpgradeZoneRadius * 2f, 0.01f, UpgradeZoneRadius * 2f);
+        upgradeZoneObject.GetComponent<Renderer>().material.color = new Color(0.82f, 0.74f, 0.26f, 0.35f);
+        Destroy(upgradeZoneObject.GetComponent<Collider>());
+
         turrets.Add(new DefenseTurret
         {
             Transform = castleTransform,
@@ -713,9 +723,9 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             return;
         }
 
-        var nearCastle = Vector3.Distance(holeTransform.position, CastlePosition + new Vector3(0f, 0.15f, 0f)) <= CastleZoneRadius;
-        upgradePanel.SetActive(nearCastle);
-        if (!nearCastle)
+        var inUpgradeZone = Vector3.Distance(holeTransform.position, UpgradeZonePosition + new Vector3(0f, 0.15f, 0f)) <= UpgradeZoneRadius;
+        upgradePanel.SetActive(inUpgradeZone);
+        if (!inUpgradeZone)
         {
             return;
         }
