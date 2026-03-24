@@ -189,6 +189,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         musicSource.playOnAwake = false;
         musicSource.loop = true;
         musicSource.spatialBlend = 0f;
+        musicSource.volume = 0.5f;
         musicSource.clip = levelMusicClip;
         musicSource.mute = !soundEnabled;
     }
