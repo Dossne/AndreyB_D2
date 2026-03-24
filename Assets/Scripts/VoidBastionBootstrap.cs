@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -79,6 +80,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private Text towerSpotCancelButtonText;
     private AudioSource musicSource;
     private AudioClip levelMusicClip;
+    private Shader runtimeObjectShader;
 
     private bool soundEnabled = true;
     private bool gameStarted;
@@ -383,7 +385,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         groundObject.transform.SetParent(worldRoot);
         groundObject.transform.position = new Vector3(0f, -0.55f, 0f);
         groundObject.transform.localScale = new Vector3(MapWidth, 1f, MapHeight);
-        groundObject.GetComponent<Renderer>().material.color = new Color(0.37f, 0.68f, 0.34f);
+        ApplyRuntimeColor(groundObject.GetComponent<Renderer>(), new Color(0.37f, 0.68f, 0.34f));
     }
 
     private void CreateRoad()
@@ -457,7 +459,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
                 roadObject.transform.position = midpoint;
                 roadObject.transform.localScale = new Vector3(2.4f, 0.08f, length);
                 roadObject.transform.rotation = Quaternion.LookRotation(to - from);
-                roadObject.GetComponent<Renderer>().material.color = new Color(0.45f, 0.28f, 0.12f);
+                ApplyRuntimeColor(roadObject.GetComponent<Renderer>(), new Color(0.45f, 0.28f, 0.12f));
                 Destroy(roadObject.GetComponent<Collider>());
             }
         }
@@ -487,7 +489,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             var meshFilter = mountainObject.AddComponent<MeshFilter>();
             meshFilter.sharedMesh = mountainMesh;
             var meshRenderer = mountainObject.AddComponent<MeshRenderer>();
-            meshRenderer.material.color = new Color(0.4f, 0.4f, 0.45f);
+            ApplyRuntimeColor(meshRenderer, new Color(0.4f, 0.4f, 0.45f));
             mountainBounds.Add(new Bounds(mountain.Position, new Vector3(mountain.Size.x * 0.75f, mountain.Size.y, mountain.Size.z * 0.75f)));
         }
     }
@@ -541,7 +543,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         castleObject.transform.SetParent(worldRoot);
         castleObject.transform.position = CastlePosition + new Vector3(0f, 0.6f, 0f);
         castleObject.transform.localScale = new Vector3(2.2f, 1.2f, 2.2f);
-        castleObject.GetComponent<Renderer>().material.color = new Color(0.76f, 0.72f, 0.64f);
+        ApplyRuntimeColor(castleObject.GetComponent<Renderer>(), new Color(0.76f, 0.72f, 0.64f));
         castleTransform = castleObject.transform;
 
         var zoneObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -549,7 +551,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         zoneObject.transform.SetParent(worldRoot);
         zoneObject.transform.position = CastlePosition + new Vector3(0f, 0.01f, 0f);
         zoneObject.transform.localScale = new Vector3(CastleZoneRadius * 2f, 0.01f, CastleZoneRadius * 2f);
-        zoneObject.GetComponent<Renderer>().material.color = new Color(0.3f, 0.52f, 0.34f, 0.35f);
+        ApplyRuntimeColor(zoneObject.GetComponent<Renderer>(), new Color(0.3f, 0.52f, 0.34f, 0.35f));
         Destroy(zoneObject.GetComponent<Collider>());
 
         var upgradeZoneObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -557,7 +559,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         upgradeZoneObject.transform.SetParent(worldRoot);
         upgradeZoneObject.transform.position = UpgradeZonePosition + new Vector3(0f, 0.01f, 0f);
         upgradeZoneObject.transform.localScale = new Vector3(UpgradeZoneHalfSize * 2f, 0.02f, UpgradeZoneHalfSize * 2f);
-        upgradeZoneObject.GetComponent<Renderer>().material.color = new Color(0.82f, 0.74f, 0.26f, 0.35f);
+        ApplyRuntimeColor(upgradeZoneObject.GetComponent<Renderer>(), new Color(0.82f, 0.74f, 0.26f, 0.35f));
         Destroy(upgradeZoneObject.GetComponent<Collider>());
 
         turrets.Add(new DefenseTurret
@@ -576,7 +578,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         holeObject.name = "Player Hole";
         holeObject.transform.SetParent(worldRoot);
         holeObject.transform.position = HoleStartPosition;
-        holeObject.GetComponent<Renderer>().material.color = new Color(0.05f, 0.05f, 0.07f);
+        ApplyRuntimeColor(holeObject.GetComponent<Renderer>(), new Color(0.05f, 0.05f, 0.07f));
         Destroy(holeObject.GetComponent<Collider>());
         holeTransform = holeObject.transform;
         holeTarget = holeTransform.position;
@@ -808,7 +810,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         resourceObject.transform.localScale = resourceScale;
         var resourceRenderer = resourceObject.GetComponent<Renderer>();
         resourceObject.transform.position = FindResourceSpawnPosition(resourceScale.x, minX, maxX, minZ, maxZ, GroundSurfaceY + resourceRenderer.bounds.extents.y);
-        resourceRenderer.material.color = color;
+        ApplyRuntimeColor(resourceRenderer, color);
 
         var rigidbody = resourceObject.AddComponent<Rigidbody>();
         rigidbody.mass = 0.35f;
@@ -1067,7 +1069,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         enemyObject.transform.SetParent(worldRoot);
         enemyObject.transform.position = path[0] + new Vector3(0f, 0.6f, 0f);
         enemyObject.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
-        enemyObject.GetComponent<Renderer>().material.color = new Color(0.78f, 0.2f, 0.2f);
+        ApplyRuntimeColor(enemyObject.GetComponent<Renderer>(), new Color(0.78f, 0.2f, 0.2f));
 
         enemies.Add(new EnemyUnit
         {
@@ -1296,7 +1298,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         towerObject.transform.SetParent(worldRoot);
         towerObject.transform.position = TowerBuildPositions[selectedTowerSlotIndex];
         towerObject.transform.localScale = new Vector3(0.9f, 1.1f, 0.9f);
-        towerObject.GetComponent<Renderer>().material.color = new Color(0.58f, 0.68f, 0.82f);
+        ApplyRuntimeColor(towerObject.GetComponent<Renderer>(), new Color(0.58f, 0.68f, 0.82f));
 
         turrets.Add(new DefenseTurret
         {
@@ -1367,15 +1369,15 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var renderer = castleTransform.GetComponent<Renderer>();
         if (castleUpgradeLevel >= 4)
         {
-            renderer.material.color = new Color(0.82f, 0.76f, 0.62f);
+            ApplyRuntimeColor(renderer, new Color(0.82f, 0.76f, 0.62f));
         }
         else if (castleUpgradeLevel >= 2)
         {
-            renderer.material.color = new Color(0.72f, 0.74f, 0.78f);
+            ApplyRuntimeColor(renderer, new Color(0.72f, 0.74f, 0.78f));
         }
         else
         {
-            renderer.material.color = new Color(0.76f, 0.72f, 0.64f);
+            ApplyRuntimeColor(renderer, new Color(0.76f, 0.72f, 0.64f));
         }
     }
 
@@ -1492,7 +1494,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         enemy.HitPoints -= amount;
         var healthFactor = Mathf.Clamp01(enemy.HitPoints / enemy.MaxHitPoints);
         var enemyColor = Color.Lerp(new Color(0.22f, 0.1f, 0.1f), new Color(0.78f, 0.2f, 0.2f), healthFactor);
-        enemy.Transform.GetComponent<Renderer>().material.color = enemyColor;
+        ApplyRuntimeColor(enemy.Transform.GetComponent<Renderer>(), enemyColor);
 
         if (enemy.HitPoints > 0f)
         {
@@ -1514,7 +1516,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             chunkObject.transform.SetParent(worldRoot);
             chunkObject.transform.position = position + Random.insideUnitSphere * 0.18f;
             chunkObject.transform.localScale = Vector3.one * Random.Range(0.18f, 0.28f);
-            chunkObject.GetComponent<Renderer>().material.color = Color.Lerp(color, new Color(1f, 0.72f, 0.3f), 0.2f * index);
+            ApplyRuntimeColor(chunkObject.GetComponent<Renderer>(), Color.Lerp(color, new Color(1f, 0.72f, 0.3f), 0.2f * index));
 
             var chunkBody = chunkObject.AddComponent<Rigidbody>();
             chunkBody.mass = 0.08f;
@@ -1563,7 +1565,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         beamObject.transform.position = (from + to) * 0.5f;
         beamObject.transform.rotation = Quaternion.LookRotation(to - from);
         beamObject.transform.localScale = new Vector3(0.12f, 0.12f, Vector3.Distance(from, to));
-        beamObject.GetComponent<Renderer>().material.color = color;
+        ApplyRuntimeColor(beamObject.GetComponent<Renderer>(), color);
         Destroy(beamObject.GetComponent<Collider>());
         temporaryVisuals.Add(new TemporaryVisual { GameObject = beamObject, Lifetime = 0.08f });
     }
@@ -1575,7 +1577,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         pulseObject.transform.SetParent(worldRoot);
         pulseObject.transform.position = position;
         pulseObject.transform.localScale = Vector3.one * 0.4f;
-        pulseObject.GetComponent<Renderer>().material.color = color;
+        ApplyRuntimeColor(pulseObject.GetComponent<Renderer>(), color);
         Destroy(pulseObject.GetComponent<Collider>());
         temporaryVisuals.Add(new TemporaryVisual { GameObject = pulseObject, Lifetime = 0.16f });
     }
@@ -1646,6 +1648,105 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void ApplyRuntimeColor(Renderer renderer, Color color)
+    {
+        if (renderer == null)
+        {
+            return;
+        }
+
+        var material = renderer.sharedMaterial;
+        var shader = GetRuntimeObjectShader();
+        var isTransparent = color.a < 0.999f;
+
+        if (material == null || material.shader != shader || IsTransparentMaterial(material) != isTransparent)
+        {
+            material = new Material(shader);
+            renderer.sharedMaterial = material;
+        }
+
+        ConfigureRuntimeMaterial(material, color);
+    }
+
+    private Shader GetRuntimeObjectShader()
+    {
+        if (runtimeObjectShader != null)
+        {
+            return runtimeObjectShader;
+        }
+
+        runtimeObjectShader =
+            Shader.Find("Universal Render Pipeline/Lit") ??
+            Shader.Find("Universal Render Pipeline/Simple Lit") ??
+            Shader.Find("Standard") ??
+            Shader.Find("Diffuse");
+
+        return runtimeObjectShader;
+    }
+
+    private void ConfigureRuntimeMaterial(Material material, Color color)
+    {
+        var isTransparent = color.a < 0.999f;
+
+        if (material.HasProperty("_BaseColor"))
+        {
+            material.SetColor("_BaseColor", color);
+        }
+
+        if (material.HasProperty("_Color"))
+        {
+            material.SetColor("_Color", color);
+        }
+
+        if (material.HasProperty("_Surface"))
+        {
+            material.SetFloat("_Surface", isTransparent ? 1f : 0f);
+        }
+
+        if (material.HasProperty("_ZWrite"))
+        {
+            material.SetFloat("_ZWrite", isTransparent ? 0f : 1f);
+        }
+
+        if (isTransparent)
+        {
+            if (material.HasProperty("_SrcBlend"))
+            {
+                material.SetInt("_SrcBlend", (int)BlendMode.SrcAlpha);
+            }
+
+            if (material.HasProperty("_DstBlend"))
+            {
+                material.SetInt("_DstBlend", (int)BlendMode.OneMinusSrcAlpha);
+            }
+
+            material.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            material.renderQueue = (int)RenderQueue.Transparent;
+        }
+        else
+        {
+            if (material.HasProperty("_SrcBlend"))
+            {
+                material.SetInt("_SrcBlend", (int)BlendMode.One);
+            }
+
+            if (material.HasProperty("_DstBlend"))
+            {
+                material.SetInt("_DstBlend", (int)BlendMode.Zero);
+            }
+
+            material.DisableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            material.renderQueue = (int)RenderQueue.Geometry;
+        }
+    }
+
+    private bool IsTransparentMaterial(Material material)
+    {
+        return material != null &&
+            ((material.HasProperty("_Surface") && material.GetFloat("_Surface") > 0.5f) ||
+             material.renderQueue >= (int)RenderQueue.Transparent);
     }
 
     private GameObject CreatePanel(string panelName, Vector2 anchor, Vector2 size, Color color)
