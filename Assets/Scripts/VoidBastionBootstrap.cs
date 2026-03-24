@@ -1140,6 +1140,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var rectTransform = panelObject.GetComponent<RectTransform>();
         if (size == Vector2.zero)
         {
+            image.raycastTarget = false;
             rectTransform.anchorMin = Vector2.zero;
             rectTransform.anchorMax = Vector2.one;
             rectTransform.offsetMin = Vector2.zero;
