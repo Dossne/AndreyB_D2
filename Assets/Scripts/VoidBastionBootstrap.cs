@@ -196,12 +196,12 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
         menuPanel = CreatePanel("Menu Panel", new Vector2(0.5f, 0.5f), new Vector2(680f, 820f), new Color(0.07f, 0.11f, 0.14f, 0.84f));
         CreateText(menuPanel.transform, "Void Bastion", 72, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.82f), new Vector2(560f, 120f));
-        CreateText(menuPanel.transform, "Guide the living void, feed the castle and survive every wave.", 34, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.62f), new Vector2(560f, 140f));
+        CreateText(menuPanel.transform, "Управляй живой дырой, корми замок и переживи все волны.", 34, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.62f), new Vector2(560f, 140f));
 
-        var playButton = CreateButton(menuPanel.transform, "Play", new Vector2(0.5f, 0.38f), new Vector2(320f, 110f));
+        var playButton = CreateButton(menuPanel.transform, "Играть", new Vector2(0.5f, 0.38f), new Vector2(320f, 110f));
         playButton.onClick.AddListener(StartGame);
 
-        var settingsButton = CreateButton(menuPanel.transform, "Sound: On", new Vector2(0.5f, 0.2f), new Vector2(320f, 100f));
+        var settingsButton = CreateButton(menuPanel.transform, "Звук: Вкл", new Vector2(0.5f, 0.2f), new Vector2(320f, 100f));
         soundToggle = new ToggleableButton
         {
             Button = settingsButton,
@@ -213,18 +213,18 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var resourcePanel = CreatePanel("Resource Panel", new Vector2(0.1385f, 0.8985f), new Vector2(300f, 170f), new Color(0f, 0f, 0f, 0f));
         resourcePanel.transform.SetParent(hudPanel.transform, false);
         resourceText = CreateText(resourcePanel.transform, string.Empty, 28, TextAnchor.UpperLeft, new Vector2(0.5f, 0.5f), new Vector2(250f, 130f));
-        waveText = CreateText(hudPanel.transform, "Wave: 0/15", 30, TextAnchor.UpperCenter, new Vector2(0.5f, 0.96f), new Vector2(260f, 70f));
-        castleHpText = CreateText(hudPanel.transform, "Castle HP: 120/120", 30, TextAnchor.UpperRight, new Vector2(0.8289f, 0.934f), new Vector2(360f, 70f));
-        statusText = CreateText(hudPanel.transform, "Gather resources to empower the bastion.", 28, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.88f), new Vector2(860f, 80f));
+        waveText = CreateText(hudPanel.transform, "Волна: 0/15", 30, TextAnchor.UpperCenter, new Vector2(0.5f, 0.96f), new Vector2(260f, 70f));
+        castleHpText = CreateText(hudPanel.transform, "HP замка: 120/120", 30, TextAnchor.UpperRight, new Vector2(0.8289f, 0.934f), new Vector2(360f, 70f));
+        statusText = CreateText(hudPanel.transform, "Собирайте ресурсы, чтобы усилить бастион.", 28, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.88f), new Vector2(860f, 80f));
 
-        sprintButton = CreateButton(hudPanel.transform, "Sprint", new Vector2(0.17f, 0.12f), new Vector2(220f, 110f));
+        sprintButton = CreateButton(hudPanel.transform, "Рывок", new Vector2(0.17f, 0.12f), new Vector2(220f, 110f));
         sprintButton.onClick.AddListener(TriggerSprint);
         sprintButtonText = sprintButton.GetComponentInChildren<Text>();
 
         upgradePanel = CreatePanel("Upgrade Panel", new Vector2(0.5f, 0.12f), new Vector2(940f, 250f), new Color(0f, 0f, 0f, 0f));
-        castleUpgradeButton = CreateButton(upgradePanel.transform, "Castle Upgrade", new Vector2(0.2f, 0.3f), new Vector2(250f, 94f));
-        holeUpgradeButton = CreateButton(upgradePanel.transform, "Hole Upgrade", new Vector2(0.5f, 0.3f), new Vector2(250f, 94f));
-        towerBuildButton = CreateButton(upgradePanel.transform, "Build Tower", new Vector2(0.8f, 0.3f), new Vector2(250f, 94f));
+        castleUpgradeButton = CreateButton(upgradePanel.transform, "Замок", new Vector2(0.2f, 0.3f), new Vector2(250f, 94f));
+        holeUpgradeButton = CreateButton(upgradePanel.transform, "Дыра", new Vector2(0.5f, 0.3f), new Vector2(250f, 94f));
+        towerBuildButton = CreateButton(upgradePanel.transform, "Башня", new Vector2(0.8f, 0.3f), new Vector2(250f, 94f));
         castleUpgradeButton.onClick.AddListener(UpgradeCastle);
         holeUpgradeButton.onClick.AddListener(UpgradeHole);
         towerBuildButton.onClick.AddListener(BuildTower);
@@ -244,15 +244,15 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
         for (int index = 0; index < TowerBuildPositions.Length; index++)
         {
-            var towerSlotButton = CreateButton(upgradePanel.transform, "Spot " + (index + 1), slotAnchors[index], new Vector2(110f, 54f));
+            var towerSlotButton = CreateButton(upgradePanel.transform, "Точка " + (index + 1), slotAnchors[index], new Vector2(110f, 54f));
             var slotIndex = index;
             towerSlotButton.onClick.AddListener(() => SelectTowerSlot(slotIndex));
             towerSlotButtons.Add(towerSlotButton);
             towerSlotButtonTexts.Add(towerSlotButton.GetComponentInChildren<Text>());
         }
 
-        towerSpotBuildButton = CreateButton(hudPanel.transform, "Build", new Vector2(0.5f, 0.5f), new Vector2(120f, 56f));
-        towerSpotCancelButton = CreateButton(hudPanel.transform, "Cancel", new Vector2(0.5f, 0.5f), new Vector2(120f, 56f));
+        towerSpotBuildButton = CreateButton(hudPanel.transform, "Построить", new Vector2(0.5f, 0.5f), new Vector2(120f, 56f));
+        towerSpotCancelButton = CreateButton(hudPanel.transform, "Отмена", new Vector2(0.5f, 0.5f), new Vector2(120f, 56f));
         towerSpotBuildButton.onClick.AddListener(ConfirmTowerBuild);
         towerSpotCancelButton.onClick.AddListener(CancelTowerBuild);
         towerSpotBuildButtonText = towerSpotBuildButton.GetComponentInChildren<Text>();
@@ -263,9 +263,9 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         endPanel = CreatePanel("End Panel", new Vector2(0.5f, 0.5f), new Vector2(720f, 620f), new Color(0.05f, 0.08f, 0.12f, 0.9f));
         endTitleText = CreateText(endPanel.transform, string.Empty, 68, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.72f), new Vector2(520f, 100f));
         endBodyText = CreateText(endPanel.transform, string.Empty, 34, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.48f), new Vector2(560f, 180f));
-        var restartButton = CreateButton(endPanel.transform, "Restart", new Vector2(0.32f, 0.18f), new Vector2(260f, 110f));
+        var restartButton = CreateButton(endPanel.transform, "Рестарт", new Vector2(0.32f, 0.18f), new Vector2(260f, 110f));
         restartButton.onClick.AddListener(RestartGame);
-        var menuButton = CreateButton(endPanel.transform, "Menu", new Vector2(0.68f, 0.18f), new Vector2(260f, 110f));
+        var menuButton = CreateButton(endPanel.transform, "Меню", new Vector2(0.68f, 0.18f), new Vector2(260f, 110f));
         menuButton.onClick.AddListener(ReturnToMenu);
 
         hudPanel.SetActive(false);
@@ -659,10 +659,10 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
         sprintButton.interactable = !sprintHiddenByUpgradeZone && !sprintActive && sprintCooldownRemaining <= 0f;
         sprintButtonText.text = sprintActive
-            ? "Sprint!"
+            ? "Рывок!"
             : sprintCooldownRemaining > 0f
-                ? "Sprint " + Mathf.CeilToInt(sprintCooldownRemaining)
-                : "Sprint";
+                ? "Рывок " + Mathf.CeilToInt(sprintCooldownRemaining)
+                : "Рывок";
     }
 
     private void UpdateAbsorption()
@@ -875,13 +875,13 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var holeCost = GetHoleUpgradeCost();
         var towerCost = GetTowerBuildCost();
         var selectedSlotBuilt = builtTowerSlots[selectedTowerSlotIndex];
-        castleUpgradeButtonText.text = "Castle +" + (castleUpgradeLevel + 1) + "\n" + FormatCost(castleCost);
-        holeUpgradeButtonText.text = "Hole +" + (holeUpgradeLevel + 1) + "\n" + FormatCost(holeCost);
+        castleUpgradeButtonText.text = "Замок +" + (castleUpgradeLevel + 1) + "\n" + FormatCost(castleCost);
+        holeUpgradeButtonText.text = "Дыра +" + (holeUpgradeLevel + 1) + "\n" + FormatCost(holeCost);
         towerBuildButtonText.text = builtTowerCount >= TowerBuildPositions.Length
-            ? "Towers Full"
+            ? "Башни заняты"
             : !isChoosingTowerSpot
-                ? "Build Tower\n" + FormatCost(towerCost)
-                : "Choose Spot";
+                ? "Построить\n" + FormatCost(towerCost)
+                : "Выберите точку";
         castleUpgradeButton.interactable = HasResources(castleCost);
         holeUpgradeButton.interactable = HasResources(holeCost);
         towerBuildButton.interactable = builtTowerCount < TowerBuildPositions.Length;
@@ -909,26 +909,26 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private void RefreshHud()
     {
         resourceText.text =
-            "Wood: " + resources[ResourceType.Wood] + "\n" +
-            "Stone: " + resources[ResourceType.Stone] + "\n" +
-            "Iron: " + resources[ResourceType.Iron];
-        waveText.text = "Wave: " + waveNumber + "/" + TotalWaves;
-        castleHpText.text = "Castle HP: " + Mathf.CeilToInt(castleHp) + "/" + Mathf.CeilToInt(castleMaxHp);
+            "Дерево: " + resources[ResourceType.Wood] + "\n" +
+            "Камень: " + resources[ResourceType.Stone] + "\n" +
+            "Железо: " + resources[ResourceType.Iron];
+        waveText.text = "Волна: " + waveNumber + "/" + TotalWaves;
+        castleHpText.text = "HP замка: " + Mathf.CeilToInt(castleHp) + "/" + Mathf.CeilToInt(castleMaxHp);
 
         if (!waveActive)
         {
             var nextWave = Mathf.Min(waveNumber + 1, TotalWaves);
             statusText.text = nextWave > TotalWaves
-                ? "All waves cleared."
-                : "Upgrade window: " + Mathf.CeilToInt(Mathf.Max(0f, waveBreakTimer)) + "s until wave " + nextWave + ".";
+                ? "Все волны пройдены."
+                : "Время на улучшения: " + Mathf.CeilToInt(Mathf.Max(0f, waveBreakTimer)) + "с до волны " + nextWave + ".";
         }
         else if (waveSpawning)
         {
-            statusText.text = "Wave " + waveNumber + " pouring in. Enemies left: " + (enemies.Count + enemiesLeftToSpawn);
+            statusText.text = "Волна " + waveNumber + " наступает. Осталось врагов: " + (enemies.Count + enemiesLeftToSpawn);
         }
         else
         {
-            statusText.text = "Wave " + waveNumber + " in progress. Clean up the stragglers.";
+            statusText.text = "Волна " + waveNumber + " продолжается. Добейте оставшихся.";
         }
     }
 
@@ -946,7 +946,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private void ToggleSound()
     {
         soundEnabled = !soundEnabled;
-        soundToggle.Label.text = soundEnabled ? "Sound: On" : "Sound: Off";
+        soundToggle.Label.text = soundEnabled ? "Звук: Вкл" : "Звук: Выкл";
     }
 
     private void UpdateHoleVisual()
@@ -1029,7 +1029,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         waveSpawning = true;
         enemiesLeftToSpawn = 5 + waveNumber * 5;
         nextSpawnTimer = 0f;
-        statusText.text = "Wave " + waveNumber + " is approaching. Hold the bastion.";
+        statusText.text = "Волна " + waveNumber + " приближается. Удержите бастион.";
     }
 
     private void SpawnEnemy()
@@ -1235,7 +1235,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             var slotImage = slotButton.GetComponent<Image>();
 
             slotButton.gameObject.SetActive(isChoosingTowerSpot);
-            slotText.text = slotBuilt ? "Built" : "Spot " + (index + 1);
+            slotText.text = slotBuilt ? "Готово" : "Точка " + (index + 1);
             slotButton.interactable = isChoosingTowerSpot && !slotBuilt;
 
             if (slotImage != null)
@@ -1318,7 +1318,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var selectedSlotBuilt = builtTowerSlots[selectedTowerSlotIndex];
         var towerCost = GetTowerBuildCost();
         towerSpotBuildButton.interactable = !selectedSlotBuilt && HasResources(towerCost);
-        towerSpotBuildButtonText.text = selectedSlotBuilt ? "Built" : "Build";
+        towerSpotBuildButtonText.text = selectedSlotBuilt ? "Готово" : "Построить";
         towerSpotCancelButton.interactable = true;
 
         var screenPoint = mainCamera.WorldToScreenPoint(TowerBuildPositions[selectedTowerSlotIndex] + new Vector3(0f, 1.6f, 0f));
@@ -1355,10 +1355,10 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         gameEnded = true;
         upgradePanel.SetActive(false);
         endPanel.SetActive(true);
-        endTitleText.text = victory ? "Victory" : "Game Over";
+        endTitleText.text = victory ? "Победа" : "Поражение";
         endBodyText.text = victory
-            ? "The Void Bastion endured all 15 waves."
-            : "The castle fell during wave " + Mathf.Max(1, waveNumber) + ".";
+            ? "Бастион Бездны выстоял все 15 волн."
+            : "Замок пал на волне " + Mathf.Max(1, waveNumber) + ".";
     }
 
     private void RestartGame()
