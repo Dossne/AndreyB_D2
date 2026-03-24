@@ -16,7 +16,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float CameraFollowHeight = 12f;
     private const float CameraFollowDepthOffset = -12f;
     private const float HoleCenterY = -0.22f;
-    private const float ResourceHoverY = 1.4f;
+    private const float ResourceHoverY = 1.2f;
     private const int TotalWaves = 15;
 
     private static readonly Vector3 CastlePosition = new Vector3(1.5f, 0f, 0f);
