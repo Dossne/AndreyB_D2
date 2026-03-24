@@ -317,14 +317,14 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         {
             var from = roadWaypoints[index];
             var to = roadWaypoints[index + 1];
-            var midpoint = (from + to) * 0.5f + new Vector3(0f, -0.2f, 0f);
+            var midpoint = (from + to) * 0.5f + new Vector3(0f, 0.02f, 0f);
             var length = Vector3.Distance(from, to);
 
             var roadObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
             roadObject.name = "Road Segment";
             roadObject.transform.SetParent(worldRoot);
             roadObject.transform.position = midpoint;
-            roadObject.transform.localScale = new Vector3(2.4f, 0.15f, length);
+            roadObject.transform.localScale = new Vector3(2.4f, 0.08f, length);
             roadObject.transform.rotation = Quaternion.LookRotation(to - from);
             roadObject.GetComponent<Renderer>().material.color = new Color(0.45f, 0.28f, 0.12f);
             Destroy(roadObject.GetComponent<Collider>());
