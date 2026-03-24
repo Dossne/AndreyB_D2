@@ -12,6 +12,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float UpgradeZoneHalfSize = 7f / 3f;
     private const float SprintDuration = 1.5f;
     private const float SprintCooldown = 5f;
+    private const float FirstWaveBreakDuration = 40f;
     private const float WaveBreakDuration = 30f;
     private const float ResourceRespawnInterval = 2.5f;
     private const float CameraFollowHeight = 12f;
@@ -313,7 +314,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         castleRange = 7f;
         castleCooldown = 0.85f;
         nextSpawnTimer = 0f;
-        waveBreakTimer = 3f;
+        waveBreakTimer = FirstWaveBreakDuration;
         resourceRespawnTimer = ResourceRespawnInterval;
         selectedTowerSlotIndex = 0;
         isChoosingTowerSpot = false;
