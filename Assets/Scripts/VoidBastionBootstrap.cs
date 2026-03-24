@@ -1681,6 +1681,9 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         }
 
         runtimeObjectShader =
+            Shader.Find("Universal Render Pipeline/Unlit") ??
+            Shader.Find("Unlit/Color") ??
+            Shader.Find("Sprites/Default") ??
             Shader.Find("Universal Render Pipeline/Lit") ??
             Shader.Find("Universal Render Pipeline/Simple Lit") ??
             Shader.Find("Standard") ??
