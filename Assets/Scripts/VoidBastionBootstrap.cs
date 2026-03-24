@@ -508,10 +508,6 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
                 continue;
             }
 
-            if (distance <= holeRadius + 1.6f)
-            {
-                node.Transform.position += direction.normalized * Time.deltaTime * 3.5f;
-            }
         }
     }
 
