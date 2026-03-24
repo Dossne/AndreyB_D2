@@ -1009,7 +1009,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         waveNumber++;
         waveActive = true;
         waveSpawning = true;
-        enemiesLeftToSpawn = 3 + waveNumber * 2;
+        enemiesLeftToSpawn = 8 + waveNumber * 2;
         nextSpawnTimer = 0f;
         statusText.text = "Wave " + waveNumber + " is approaching. Hold the bastion.";
     }
