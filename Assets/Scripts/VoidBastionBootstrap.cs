@@ -185,7 +185,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         settingsButton.onClick.AddListener(ToggleSound);
 
         hudPanel = CreatePanel("HUD Panel", new Vector2(0.5f, 0.5f), Vector2.zero, new Color(0f, 0f, 0f, 0f));
-        var resourcePanel = CreatePanel("Resource Panel", new Vector2(0.1385f, 0.8985f), new Vector2(300f, 170f), new Color(0.08f, 0.12f, 0.1f, 0.72f));
+        var resourcePanel = CreatePanel("Resource Panel", new Vector2(0.1385f, 0.8985f), new Vector2(300f, 170f), new Color(0f, 0f, 0f, 0f));
         resourcePanel.transform.SetParent(hudPanel.transform, false);
         resourceText = CreateText(resourcePanel.transform, string.Empty, 28, TextAnchor.UpperLeft, new Vector2(0.5f, 0.5f), new Vector2(250f, 130f));
         waveText = CreateText(hudPanel.transform, "Wave: 0/15", 30, TextAnchor.UpperCenter, new Vector2(0.5f, 0.96f), new Vector2(260f, 70f));
