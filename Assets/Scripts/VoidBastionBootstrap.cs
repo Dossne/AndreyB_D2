@@ -684,6 +684,15 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         for (int attempt = 0; attempt < ResourceSpawnAttempts; attempt++)
         {
             var candidatePosition = new Vector3(Random.Range(minX, maxX), spawnY, Random.Range(minZ, maxZ));
+            var insideUpgradeArea =
+                Mathf.Abs(candidatePosition.x - UpgradeZonePosition.x) <= UpgradeZoneHalfSize &&
+                Mathf.Abs(candidatePosition.z - UpgradeZonePosition.z) <= UpgradeZoneHalfSize;
+
+            if (insideUpgradeArea)
+            {
+                continue;
+            }
+
             var overlapsExistingResource = false;
 
             for (int index = 0; index < resourceNodes.Count; index++)
