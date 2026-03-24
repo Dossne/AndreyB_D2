@@ -388,14 +388,14 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         holeWallTransforms.Clear();
 
         var rimObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        rimObject.name = "Hole Basket Bottom";
+        rimObject.name = "Hole Bottom";
         rimObject.transform.SetParent(holeTransform, false);
         rimObject.GetComponent<Renderer>().material.color = new Color(0.03f, 0.03f, 0.04f);
         Destroy(rimObject.GetComponent<Collider>());
         holeRimTransform = rimObject.transform;
 
         var voidObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        voidObject.name = "Hole Core";
+        voidObject.name = "Hole Shaft";
         voidObject.transform.SetParent(holeTransform, false);
         voidObject.GetComponent<Renderer>().material.color = new Color(0.01f, 0.01f, 0.02f);
         Destroy(voidObject.GetComponent<Collider>());
@@ -827,20 +827,20 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
         if (holeRimTransform != null)
         {
-            holeRimTransform.localPosition = new Vector3(0f, -1.02f, 0f);
-            holeRimTransform.localScale = new Vector3(holeRadius * 0.62f, 0.06f, holeRadius * 0.62f);
+            holeRimTransform.localPosition = new Vector3(0f, -0.92f, 0f);
+            holeRimTransform.localScale = new Vector3(holeRadius * 1.08f, 0.06f, holeRadius * 1.08f);
         }
 
         if (holeVoidTransform != null)
         {
-            holeVoidTransform.localPosition = new Vector3(0f, -0.82f, 0f);
-            holeVoidTransform.localScale = new Vector3(holeRadius * 0.46f, 0.18f, holeRadius * 0.46f);
+            holeVoidTransform.localPosition = new Vector3(0f, -0.46f, 0f);
+            holeVoidTransform.localScale = new Vector3(holeRadius * 1.02f, 0.36f, holeRadius * 1.02f);
         }
 
-        var wallDistance = holeRadius * 0.78f;
-        var wallHeight = 0.42f;
-        var wallThickness = holeRadius * 0.1f;
-        var wallLength = holeRadius * 0.96f;
+        var wallDistance = holeRadius * 1.02f;
+        var wallHeight = 0.46f;
+        var wallThickness = holeRadius * 0.08f;
+        var wallLength = holeRadius * 0.54f;
 
         for (int index = 0; index < holeWallTransforms.Count; index++)
         {
@@ -852,8 +852,8 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
             var angle = index * (360f / holeWallTransforms.Count);
             var direction = Quaternion.Euler(0f, angle, 0f) * Vector3.forward;
-            wallTransform.localPosition = new Vector3(direction.x * wallDistance, -0.38f, direction.z * wallDistance);
-            wallTransform.localRotation = Quaternion.Euler(52f, angle, 0f);
+            wallTransform.localPosition = new Vector3(direction.x * wallDistance, -0.46f, direction.z * wallDistance);
+            wallTransform.localRotation = Quaternion.Euler(0f, angle, 0f);
             wallTransform.localScale = new Vector3(wallThickness, wallHeight, wallLength);
         }
     }
