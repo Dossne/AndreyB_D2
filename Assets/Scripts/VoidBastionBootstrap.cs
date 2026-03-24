@@ -326,7 +326,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             roadObject.transform.position = midpoint;
             roadObject.transform.localScale = new Vector3(2.4f, 0.15f, length);
             roadObject.transform.rotation = Quaternion.LookRotation(to - from);
-            roadObject.GetComponent<Renderer>().material.color = new Color(0.56f, 0.46f, 0.34f);
+            roadObject.GetComponent<Renderer>().material.color = new Color(0.45f, 0.28f, 0.12f);
             Destroy(roadObject.GetComponent<Collider>());
         }
     }
