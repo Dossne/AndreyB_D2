@@ -447,9 +447,9 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private void SpawnResources()
     {
-        SpawnResourceStrip(ResourceType.Wood, 10);
-        SpawnResourceStrip(ResourceType.Stone, 8);
-        SpawnResourceStrip(ResourceType.Iron, 6);
+        SpawnResourceStrip(ResourceType.Wood, 20);
+        SpawnResourceStrip(ResourceType.Stone, 16);
+        SpawnResourceStrip(ResourceType.Iron, 12);
     }
 
     private void SpawnResourceStrip(ResourceType type, int count)
@@ -618,11 +618,11 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         switch (type)
         {
             case ResourceType.Wood:
-                return 10;
+                return 20;
             case ResourceType.Stone:
-                return 8;
+                return 16;
             default:
-                return 6;
+                return 12;
         }
     }
 
