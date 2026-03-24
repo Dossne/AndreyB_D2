@@ -1488,7 +1488,8 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     {
         enemy.HitPoints -= amount;
         var healthFactor = Mathf.Clamp01(enemy.HitPoints / enemy.MaxHitPoints);
-        enemy.Transform.GetComponent<Renderer>().material.color = Color.Lerp(new Color(0.22f, 0.1f, 0.1f), new Color(0.78f, 0.2f, 0.2f), healthFactor);
+        var enemyColor = Color.Lerp(new Color(0.22f, 0.1f, 0.1f), new Color(0.78f, 0.2f, 0.2f), healthFactor);
+        enemy.Transform.GetComponent<Renderer>().material.color = enemyColor;
 
         if (enemy.HitPoints > 0f)
         {
@@ -1496,8 +1497,36 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         }
 
         CreatePulseVisual(enemy.Transform.position + Vector3.up * 0.35f, new Color(1f, 0.7f, 0.25f));
+        CreateEnemyDeathChunks(enemy.Transform.position + Vector3.up * 0.45f, enemyColor);
         Destroy(enemy.Transform.gameObject);
         enemies.Remove(enemy);
+    }
+
+    private void CreateEnemyDeathChunks(Vector3 position, Color color)
+    {
+        for (int index = 0; index < 5; index++)
+        {
+            var chunkObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            chunkObject.name = "Enemy Chunk";
+            chunkObject.transform.SetParent(worldRoot);
+            chunkObject.transform.position = position + Random.insideUnitSphere * 0.18f;
+            chunkObject.transform.localScale = Vector3.one * Random.Range(0.18f, 0.28f);
+            chunkObject.GetComponent<Renderer>().material.color = Color.Lerp(color, new Color(1f, 0.72f, 0.3f), 0.2f * index);
+
+            var chunkBody = chunkObject.AddComponent<Rigidbody>();
+            chunkBody.mass = 0.08f;
+            chunkBody.drag = 0.15f;
+            chunkBody.angularDrag = 0.05f;
+            chunkBody.velocity =
+                new Vector3(Random.Range(-2.2f, 2.2f), Random.Range(2.6f, 4.1f), Random.Range(-2.2f, 2.2f));
+            chunkBody.angularVelocity = Random.onUnitSphere * Random.Range(7f, 13f);
+
+            temporaryVisuals.Add(new TemporaryVisual
+            {
+                GameObject = chunkObject,
+                Lifetime = 1.1f
+            });
+        }
     }
 
     private EnemyUnit FindClosestEnemy(Vector3 from, float range)
