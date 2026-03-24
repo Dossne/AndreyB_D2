@@ -63,11 +63,15 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private Button castleUpgradeButton;
     private Button holeUpgradeButton;
     private Button towerBuildButton;
+    private Button towerSpotBuildButton;
+    private Button towerSpotCancelButton;
     private readonly List<Button> towerSlotButtons = new List<Button>();
     private readonly List<Text> towerSlotButtonTexts = new List<Text>();
     private Text castleUpgradeButtonText;
     private Text holeUpgradeButtonText;
     private Text towerBuildButtonText;
+    private Text towerSpotBuildButtonText;
+    private Text towerSpotCancelButtonText;
 
     private bool soundEnabled = true;
     private bool gameStarted;
@@ -242,6 +246,15 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             towerSlotButtonTexts.Add(towerSlotButton.GetComponentInChildren<Text>());
         }
 
+        towerSpotBuildButton = CreateButton(hudPanel.transform, "Build", new Vector2(0.5f, 0.5f), new Vector2(120f, 56f));
+        towerSpotCancelButton = CreateButton(hudPanel.transform, "Cancel", new Vector2(0.5f, 0.5f), new Vector2(120f, 56f));
+        towerSpotBuildButton.onClick.AddListener(ConfirmTowerBuild);
+        towerSpotCancelButton.onClick.AddListener(CancelTowerBuild);
+        towerSpotBuildButtonText = towerSpotBuildButton.GetComponentInChildren<Text>();
+        towerSpotCancelButtonText = towerSpotCancelButton.GetComponentInChildren<Text>();
+        towerSpotBuildButtonText.fontSize = 24;
+        towerSpotCancelButtonText.fontSize = 24;
+
         endPanel = CreatePanel("End Panel", new Vector2(0.5f, 0.5f), new Vector2(720f, 620f), new Color(0.05f, 0.08f, 0.12f, 0.9f));
         endTitleText = CreateText(endPanel.transform, string.Empty, 68, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.72f), new Vector2(520f, 100f));
         endBodyText = CreateText(endPanel.transform, string.Empty, 34, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.48f), new Vector2(560f, 180f));
@@ -250,6 +263,8 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
         hudPanel.SetActive(false);
         upgradePanel.SetActive(false);
+        towerSpotBuildButton.gameObject.SetActive(false);
+        towerSpotCancelButton.gameObject.SetActive(false);
         endPanel.SetActive(false);
     }
 
@@ -834,6 +849,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         {
             isChoosingTowerSpot = false;
             UpdateTowerSlotButtons();
+            UpdateTowerActionButtons();
             return;
         }
 
@@ -847,14 +863,12 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             ? "Towers Full"
             : !isChoosingTowerSpot
                 ? "Build Tower\n" + FormatCost(towerCost)
-                : selectedSlotBuilt
-                    ? "Spot Built"
-                    : "Build Spot " + (selectedTowerSlotIndex + 1) + "\n" + FormatCost(towerCost);
+                : "Choose Spot";
         castleUpgradeButton.interactable = HasResources(castleCost);
         holeUpgradeButton.interactable = HasResources(holeCost);
-        towerBuildButton.interactable = builtTowerCount < TowerBuildPositions.Length &&
-            (!isChoosingTowerSpot || (!selectedSlotBuilt && HasResources(towerCost)));
+        towerBuildButton.interactable = builtTowerCount < TowerBuildPositions.Length;
         UpdateTowerSlotButtons();
+        UpdateTowerActionButtons();
     }
 
     private void SetSprintVisibility(bool isVisible)
@@ -945,6 +959,8 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             targetCameraPosition,
             ref cameraVelocity,
             0.18f);
+
+        UpdateTowerActionButtons();
     }
 
     private void UpdateWaveLoop()
@@ -1155,6 +1171,67 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         {
             isChoosingTowerSpot = true;
             UpdateTowerSlotButtons();
+            UpdateTowerActionButtons();
+            return;
+        }
+    }
+
+    private bool IsHoleInUpgradeZone()
+    {
+        if (holeTransform == null)
+        {
+            return false;
+        }
+
+        var upgradeOffset = holeTransform.position - (UpgradeZonePosition + new Vector3(0f, 0.15f, 0f));
+        return
+            Mathf.Abs(upgradeOffset.x) <= UpgradeZoneHalfSize &&
+            Mathf.Abs(upgradeOffset.z) <= UpgradeZoneHalfSize;
+    }
+
+    private void SelectTowerSlot(int slotIndex)
+    {
+        if (slotIndex < 0 || slotIndex >= TowerBuildPositions.Length)
+        {
+            return;
+        }
+
+        selectedTowerSlotIndex = slotIndex;
+        UpdateTowerSlotButtons();
+        UpdateTowerActionButtons();
+    }
+
+    private void UpdateTowerSlotButtons()
+    {
+        for (int index = 0; index < towerSlotButtons.Count; index++)
+        {
+            var slotButton = towerSlotButtons[index];
+            var slotText = towerSlotButtonTexts[index];
+            var slotBuilt = builtTowerSlots[index];
+            var slotSelected = index == selectedTowerSlotIndex;
+            var slotImage = slotButton.GetComponent<Image>();
+
+            slotButton.gameObject.SetActive(isChoosingTowerSpot);
+            slotText.text = slotBuilt ? "Built" : "Spot " + (index + 1);
+            slotButton.interactable = isChoosingTowerSpot && !slotBuilt;
+
+            if (slotImage != null)
+            {
+                slotImage.color = slotBuilt
+                    ? new Color(0.26f, 0.29f, 0.33f, 0.9f)
+                    : slotSelected
+                        ? new Color(0.92f, 0.76f, 0.34f, 0.95f)
+                        : new Color(0.18f, 0.22f, 0.27f, 0.95f);
+            }
+
+            slotText.color = slotBuilt ? new Color(0.72f, 0.76f, 0.82f) : Color.white;
+        }
+    }
+
+    private void ConfirmTowerBuild()
+    {
+        if (!isChoosingTowerSpot || builtTowerCount >= TowerBuildPositions.Length)
+        {
             return;
         }
 
@@ -1185,57 +1262,51 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         builtTowerCount++;
         isChoosingTowerSpot = false;
         UpdateTowerSlotButtons();
+        UpdateTowerActionButtons();
     }
 
-    private bool IsHoleInUpgradeZone()
+    private void CancelTowerBuild()
     {
-        if (holeTransform == null)
-        {
-            return false;
-        }
-
-        var upgradeOffset = holeTransform.position - (UpgradeZonePosition + new Vector3(0f, 0.15f, 0f));
-        return
-            Mathf.Abs(upgradeOffset.x) <= UpgradeZoneHalfSize &&
-            Mathf.Abs(upgradeOffset.z) <= UpgradeZoneHalfSize;
-    }
-
-    private void SelectTowerSlot(int slotIndex)
-    {
-        if (slotIndex < 0 || slotIndex >= TowerBuildPositions.Length)
+        if (!isChoosingTowerSpot)
         {
             return;
         }
 
-        selectedTowerSlotIndex = slotIndex;
+        isChoosingTowerSpot = false;
         UpdateTowerSlotButtons();
+        UpdateTowerActionButtons();
     }
 
-    private void UpdateTowerSlotButtons()
+    private void UpdateTowerActionButtons()
     {
-        for (int index = 0; index < towerSlotButtons.Count; index++)
+        if (towerSpotBuildButton == null || towerSpotCancelButton == null || mainCamera == null)
         {
-            var slotButton = towerSlotButtons[index];
-            var slotText = towerSlotButtonTexts[index];
-            var slotBuilt = builtTowerSlots[index];
-            var slotSelected = index == selectedTowerSlotIndex;
-            var slotImage = slotButton.GetComponent<Image>();
-
-            slotButton.gameObject.SetActive(isChoosingTowerSpot);
-            slotText.text = slotBuilt ? "Built" : "Spot " + (index + 1);
-            slotButton.interactable = isChoosingTowerSpot && !slotBuilt;
-
-            if (slotImage != null)
-            {
-                slotImage.color = slotBuilt
-                    ? new Color(0.26f, 0.29f, 0.33f, 0.9f)
-                    : slotSelected
-                        ? new Color(0.92f, 0.76f, 0.34f, 0.95f)
-                        : new Color(0.18f, 0.22f, 0.27f, 0.95f);
-            }
-
-            slotText.color = slotBuilt ? new Color(0.72f, 0.76f, 0.82f) : Color.white;
+            return;
         }
+
+        var showButtons = isChoosingTowerSpot && IsHoleInUpgradeZone();
+        towerSpotBuildButton.gameObject.SetActive(showButtons);
+        towerSpotCancelButton.gameObject.SetActive(showButtons);
+        if (!showButtons)
+        {
+            return;
+        }
+
+        var selectedSlotBuilt = builtTowerSlots[selectedTowerSlotIndex];
+        var towerCost = GetTowerBuildCost();
+        towerSpotBuildButton.interactable = !selectedSlotBuilt && HasResources(towerCost);
+        towerSpotBuildButtonText.text = selectedSlotBuilt ? "Built" : "Build";
+        towerSpotCancelButton.interactable = true;
+
+        var screenPoint = mainCamera.WorldToScreenPoint(TowerBuildPositions[selectedTowerSlotIndex] + new Vector3(0f, 1.6f, 0f));
+        var buildRect = towerSpotBuildButton.GetComponent<RectTransform>();
+        var cancelRect = towerSpotCancelButton.GetComponent<RectTransform>();
+        buildRect.anchorMin = new Vector2(0f, 0f);
+        buildRect.anchorMax = new Vector2(0f, 0f);
+        cancelRect.anchorMin = new Vector2(0f, 0f);
+        cancelRect.anchorMax = new Vector2(0f, 0f);
+        buildRect.anchoredPosition = new Vector2(screenPoint.x - 68f, screenPoint.y + 18f);
+        cancelRect.anchoredPosition = new Vector2(screenPoint.x + 68f, screenPoint.y + 18f);
     }
 
     private void ApplyCastleVisuals()
