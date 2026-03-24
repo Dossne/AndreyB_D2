@@ -63,7 +63,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private int holeUpgradeLevel;
     private int builtTowerCount;
     private float holeRadius = 1.2f;
-    private float holeSpeed = 9f;
+    private float holeSpeed = 4.5f;
     private float currentSprintTime;
     private float sprintCooldownRemaining;
     private float castleMaxHp = 120f;
@@ -239,7 +239,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         holeUpgradeLevel = 0;
         builtTowerCount = 0;
         holeRadius = 1.2f;
-        holeSpeed = 9f;
+        holeSpeed = 4.5f;
         currentSprintTime = 0f;
         sprintCooldownRemaining = 0f;
         castleMaxHp = 120f;
