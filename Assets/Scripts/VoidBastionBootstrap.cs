@@ -62,6 +62,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private bool gameStarted;
     private bool gameEnded;
     private bool isDragging;
+    private bool sprintHiddenByUpgradeZone;
     private bool sprintActive;
     private bool waveActive;
     private bool waveSpawning;
@@ -542,7 +543,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             sprintCooldownRemaining -= Time.deltaTime;
         }
 
-        sprintButton.interactable = !sprintActive && sprintCooldownRemaining <= 0f;
+        sprintButton.interactable = !sprintHiddenByUpgradeZone && !sprintActive && sprintCooldownRemaining <= 0f;
         sprintButtonText.text = sprintActive
             ? "Sprint!"
             : sprintCooldownRemaining > 0f
@@ -739,6 +740,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             Mathf.Abs(upgradeOffset.x) <= UpgradeZoneHalfSize &&
             Mathf.Abs(upgradeOffset.z) <= UpgradeZoneHalfSize;
         upgradePanel.SetActive(inUpgradeZone);
+        SetSprintVisibility(!inUpgradeZone);
         if (!inUpgradeZone)
         {
             return;
@@ -753,6 +755,23 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         castleUpgradeButton.interactable = HasResources(castleCost);
         holeUpgradeButton.interactable = HasResources(holeCost);
         towerBuildButton.interactable = builtTowerCount < 3 && HasResources(towerCost);
+    }
+
+    private void SetSprintVisibility(bool isVisible)
+    {
+        sprintHiddenByUpgradeZone = !isVisible;
+
+        var buttonImage = sprintButton.GetComponent<Image>();
+        if (buttonImage != null)
+        {
+            var imageColor = buttonImage.color;
+            imageColor.a = isVisible ? 0.95f : 0f;
+            buttonImage.color = imageColor;
+        }
+
+        var textColor = sprintButtonText.color;
+        textColor.a = isVisible ? 1f : 0f;
+        sprintButtonText.color = textColor;
     }
 
     private void RefreshHud()
