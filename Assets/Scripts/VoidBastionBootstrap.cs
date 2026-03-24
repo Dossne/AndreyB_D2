@@ -22,6 +22,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private readonly Dictionary<ResourceType, int> resources = new Dictionary<ResourceType, int>();
     private readonly List<ResourceNode> resourceNodes = new List<ResourceNode>();
+    private readonly List<FallingResource> fallingResources = new List<FallingResource>();
     private readonly List<EnemyUnit> enemies = new List<EnemyUnit>();
     private readonly List<DefenseTurret> turrets = new List<DefenseTurret>();
     private readonly List<TemporaryVisual> temporaryVisuals = new List<TemporaryVisual>();
@@ -115,6 +116,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         UpdateCameraFollow();
         UpdateSprintState();
         UpdateAbsorption();
+        UpdateFallingResources();
         UpdateResourceRespawn();
         UpdateWaveLoop();
         UpdateEnemies();
@@ -501,13 +503,46 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
             if (distance <= holeRadius + 0.35f)
             {
-                resources[node.ResourceType] += node.Amount;
-                CreatePulseVisual(node.Transform.position + Vector3.up * 0.15f, new Color(0.9f, 0.94f, 0.55f));
-                Destroy(node.Transform.gameObject);
+                fallingResources.Add(new FallingResource
+                {
+                    Transform = node.Transform,
+                    ResourceType = node.ResourceType,
+                    Amount = node.Amount,
+                    StartScale = node.Transform.localScale,
+                    Progress = 0f
+                });
                 resourceNodes.RemoveAt(index);
                 continue;
             }
 
+        }
+    }
+
+    private void UpdateFallingResources()
+    {
+        for (int index = fallingResources.Count - 1; index >= 0; index--)
+        {
+            var fallingResource = fallingResources[index];
+            if (fallingResource.Transform == null)
+            {
+                fallingResources.RemoveAt(index);
+                continue;
+            }
+
+            fallingResource.Progress += Time.deltaTime * 3.2f;
+            var targetPosition = holeTransform.position + new Vector3(0f, -0.45f, 0f);
+            fallingResource.Transform.position = Vector3.Lerp(fallingResource.Transform.position, targetPosition, fallingResource.Progress);
+            fallingResource.Transform.localScale = Vector3.Lerp(fallingResource.StartScale, Vector3.zero, fallingResource.Progress);
+
+            if (fallingResource.Progress < 1f)
+            {
+                continue;
+            }
+
+            resources[fallingResource.ResourceType] += fallingResource.Amount;
+            CreatePulseVisual(holeTransform.position + Vector3.up * 0.15f, new Color(0.9f, 0.94f, 0.55f));
+            Destroy(fallingResource.Transform.gameObject);
+            fallingResources.RemoveAt(index);
         }
     }
 
@@ -986,7 +1021,16 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             }
         }
 
+        for (int index = fallingResources.Count - 1; index >= 0; index--)
+        {
+            if (fallingResources[index].Transform != null)
+            {
+                Destroy(fallingResources[index].Transform.gameObject);
+            }
+        }
+
         enemies.Clear();
+        fallingResources.Clear();
         resourceNodes.Clear();
         turrets.Clear();
         temporaryVisuals.Clear();
@@ -1216,6 +1260,15 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         public ResourceType ResourceType;
         public int Amount;
         public Transform Transform;
+    }
+
+    private sealed class FallingResource
+    {
+        public Transform Transform;
+        public ResourceType ResourceType;
+        public int Amount;
+        public Vector3 StartScale;
+        public float Progress;
     }
 
     private sealed class EnemyUnit
