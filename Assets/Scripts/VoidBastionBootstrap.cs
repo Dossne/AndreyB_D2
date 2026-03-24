@@ -9,7 +9,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float MapWidth = 60f;
     private const float MapHeight = 44f;
     private const float CastleZoneRadius = 3.25f;
-    private const float UpgradeZoneHalfSize = 7f;
+    private const float UpgradeZoneHalfSize = 7f / 3f;
     private const float SprintDuration = 1.5f;
     private const float SprintCooldown = 5f;
     private const float WaveBreakDuration = 30f;
