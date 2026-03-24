@@ -48,6 +48,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private readonly List<TemporaryVisual> temporaryVisuals = new List<TemporaryVisual>();
     private readonly List<Bounds> mountainBounds = new List<Bounds>();
     private readonly List<List<Vector3>> roadPaths = new List<List<Vector3>>();
+    private readonly HashSet<Renderer> runtimeMaterialRenderers = new HashSet<Renderer>();
 
     private Camera mainCamera;
     private Transform holeTransform;
@@ -1657,14 +1658,16 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             return;
         }
 
-        var material = renderer.material;
         var shader = GetRuntimeObjectShader();
         var isTransparent = color.a < 0.999f;
+        var needsRuntimeMaterial = !runtimeMaterialRenderers.Contains(renderer);
+        var material = renderer.sharedMaterial;
 
-        if (material == null || material.shader != shader || IsTransparentMaterial(material) != isTransparent)
+        if (needsRuntimeMaterial || material == null || material.shader != shader || IsTransparentMaterial(material) != isTransparent)
         {
             material = new Material(shader);
-            renderer.material = material;
+            renderer.sharedMaterial = material;
+            runtimeMaterialRenderers.Add(renderer);
         }
 
         ConfigureRuntimeMaterial(material, color);
