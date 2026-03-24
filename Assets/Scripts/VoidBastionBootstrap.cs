@@ -777,7 +777,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var resourceObject = GameObject.CreatePrimitive(primitiveType);
         resourceObject.name = type + " Node";
         resourceObject.transform.SetParent(worldRoot);
-        var maxResourceSizeIndex = Mathf.Clamp(GetHoleSizeTier() - 1, 0, ResourceScaleVariants - 1);
+        var maxResourceSizeIndex = Mathf.Clamp(GetHoleSizeTier(), 0, ResourceScaleVariants - 1);
         var resourceSizeIndex = Random.Range(0, maxResourceSizeIndex + 1);
         var resourceScaleValue = ResourceScaleMin + resourceSizeIndex * ResourceScaleStep;
         var resourceScale = Vector3.one * resourceScaleValue;
