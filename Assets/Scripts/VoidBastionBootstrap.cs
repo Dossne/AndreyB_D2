@@ -174,11 +174,10 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
         mainCamera.orthographic = false;
         mainCamera.fieldOfView = 60f;
+        mainCamera.transform.position = new Vector3(CastlePosition.x + CameraFollowSideOffset, CameraFollowHeight, CastlePosition.z);
+        mainCamera.transform.rotation = Quaternion.Euler(45f, 270f, 0f);
         mainCamera.backgroundColor = new Color(0.72f, 0.88f, 0.96f);
         mainCamera.clearFlags = CameraClearFlags.SolidColor;
-        mainCamera.nearClipPlane = 0.1f;
-        mainCamera.farClipPlane = 250f;
-        PositionCamera(CastlePosition);
     }
 
     private void SetupMusic()
@@ -1002,29 +1001,13 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             focusPosition.y + CameraFollowHeight,
             focusPosition.z);
 
-        var nextCameraPosition = Vector3.SmoothDamp(
+        mainCamera.transform.position = Vector3.SmoothDamp(
             mainCamera.transform.position,
             targetCameraPosition,
             ref cameraVelocity,
             0.18f);
-        mainCamera.transform.position = nextCameraPosition;
-        mainCamera.transform.LookAt(focusPosition + Vector3.up * 0.2f);
 
         UpdateTowerActionButtons();
-    }
-
-    private void PositionCamera(Vector3 focusPosition)
-    {
-        if (mainCamera == null)
-        {
-            return;
-        }
-
-        mainCamera.transform.position = new Vector3(
-            focusPosition.x + CameraFollowSideOffset,
-            focusPosition.y + CameraFollowHeight,
-            focusPosition.z);
-        mainCamera.transform.LookAt(focusPosition + Vector3.up * 0.2f);
     }
 
     private void UpdateWaveLoop()
