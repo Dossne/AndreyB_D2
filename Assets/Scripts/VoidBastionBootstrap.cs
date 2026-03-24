@@ -100,7 +100,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private float sprintCooldownRemaining;
     private float castleMaxHp = 120f;
     private float castleHp = 120f;
-    private float castleDamage = 2.2f;
+    private float castleDamage = 5f;
     private float castleRange = 7f;
     private float castleCooldown = 0.85f;
     private float nextSpawnTimer;
@@ -310,7 +310,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         sprintCooldownRemaining = 0f;
         castleMaxHp = 120f;
         castleHp = 120f;
-        castleDamage = 2.2f;
+        castleDamage = 5f;
         castleRange = 10.5f;
         castleCooldown = 0.85f;
         nextSpawnTimer = 0f;
@@ -1152,7 +1152,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         castleUpgradeLevel++;
         castleMaxHp += 25f;
         castleHp = Mathf.Min(castleMaxHp, castleHp + 25f);
-        castleDamage += 0.6f;
+        castleDamage += 1f;
         castleRange += 0.35f;
 
         var castleTurret = turrets[0];
