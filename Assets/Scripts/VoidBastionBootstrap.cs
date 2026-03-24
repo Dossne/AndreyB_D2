@@ -16,6 +16,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float CameraFollowHeight = 12f;
     private const float CameraFollowDepthOffset = -12f;
     private const float HoleCenterY = -0.21f;
+    private const float ResourceHoverY = 1.4f;
     private const int TotalWaves = 15;
 
     private static readonly Vector3 CastlePosition = new Vector3(1.5f, 0f, 0f);
@@ -501,10 +502,20 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             var nodePosition = node.Transform.position;
             var direction = holeTransform.position - nodePosition;
             var distance = direction.magnitude;
+            var rigidbody = node.Transform.GetComponent<Rigidbody>();
+
+            var holeIsUnderResource =
+                Mathf.Abs(holeTransform.position.x - nodePosition.x) <= holeRadius * 0.75f &&
+                Mathf.Abs(holeTransform.position.z - nodePosition.z) <= holeRadius * 0.75f;
+
+            if (rigidbody != null && holeIsUnderResource && rigidbody.isKinematic)
+            {
+                rigidbody.isKinematic = false;
+                rigidbody.useGravity = true;
+            }
 
             if (distance <= holeRadius + 0.35f)
             {
-                var rigidbody = node.Transform.GetComponent<Rigidbody>();
                 if (rigidbody != null)
                 {
                     rigidbody.isKinematic = true;
@@ -639,7 +650,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var resourceObject = GameObject.CreatePrimitive(primitiveType);
         resourceObject.name = type + " Node";
         resourceObject.transform.SetParent(worldRoot);
-        resourceObject.transform.position = new Vector3(Random.Range(minX, maxX), 1.4f, Random.Range(-9f, 9f));
+        resourceObject.transform.position = new Vector3(Random.Range(minX, maxX), ResourceHoverY, Random.Range(-9f, 9f));
         resourceObject.transform.localScale = Vector3.one * Random.Range(0.7f, 1.15f);
         resourceObject.GetComponent<Renderer>().material.color = color;
 
@@ -647,6 +658,8 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         rigidbody.mass = 0.35f;
         rigidbody.drag = 1.5f;
         rigidbody.angularDrag = 3f;
+        rigidbody.useGravity = false;
+        rigidbody.isKinematic = true;
         rigidbody.constraints = RigidbodyConstraints.FreezeRotation;
 
         resourceNodes.Add(new ResourceNode
