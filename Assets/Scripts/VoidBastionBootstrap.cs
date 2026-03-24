@@ -327,6 +327,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var minZ = -MapHeight * 0.5f + 1.5f;
         var maxZ = MapHeight * 0.5f - 1.5f;
         var segmentSpacing = 3f;
+        var mountainMesh = CreateHexPyramidMesh();
 
         for (var z = minZ; z <= maxZ; z += segmentSpacing)
         {
@@ -336,14 +337,59 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
         foreach (var mountain in mountainSegments)
         {
-            var mountainObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            var mountainObject = new GameObject("Mountain");
             mountainObject.name = "Mountain";
             mountainObject.transform.SetParent(worldRoot);
             mountainObject.transform.position = mountain.Position;
-            mountainObject.transform.localScale = new Vector3(mountain.Size.x * 0.5f, mountain.Size.y, mountain.Size.z * 0.5f);
-            mountainObject.GetComponent<Renderer>().material.color = new Color(0.4f, 0.4f, 0.45f);
+            mountainObject.transform.localScale = mountain.Size;
+            var meshFilter = mountainObject.AddComponent<MeshFilter>();
+            meshFilter.sharedMesh = mountainMesh;
+            var meshRenderer = mountainObject.AddComponent<MeshRenderer>();
+            meshRenderer.material.color = new Color(0.4f, 0.4f, 0.45f);
             mountainBounds.Add(new Bounds(mountain.Position, new Vector3(mountain.Size.x * 0.75f, mountain.Size.y, mountain.Size.z * 0.75f)));
         }
+    }
+
+    private Mesh CreateHexPyramidMesh()
+    {
+        var mesh = new Mesh { name = "Hex Pyramid" };
+        var vertices = new List<Vector3>();
+        var triangles = new List<int>();
+
+        vertices.Add(new Vector3(0f, 0.5f, 0f));
+        for (int index = 0; index < 6; index++)
+        {
+            var angle = index * Mathf.PI / 3f;
+            vertices.Add(new Vector3(Mathf.Cos(angle) * 0.5f, -0.5f, Mathf.Sin(angle) * 0.5f));
+        }
+
+        vertices.Add(new Vector3(0f, -0.5f, 0f));
+
+        for (int index = 0; index < 6; index++)
+        {
+            var current = index + 1;
+            var next = index == 5 ? 1 : current + 1;
+
+            triangles.Add(0);
+            triangles.Add(next);
+            triangles.Add(current);
+        }
+
+        for (int index = 0; index < 6; index++)
+        {
+            var current = index + 1;
+            var next = index == 5 ? 1 : current + 1;
+
+            triangles.Add(7);
+            triangles.Add(current);
+            triangles.Add(next);
+        }
+
+        mesh.SetVertices(vertices);
+        mesh.SetTriangles(triangles, 0);
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+        return mesh;
     }
 
     private void CreateCastle()
