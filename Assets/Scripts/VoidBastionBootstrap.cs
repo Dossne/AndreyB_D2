@@ -420,6 +420,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             }
             else if (touch.phase == TouchPhase.Ended || touch.phase == TouchPhase.Canceled)
             {
+                holeTarget = holeTransform.position;
                 isDragging = false;
             }
 
@@ -439,6 +440,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         }
         else if (Input.GetMouseButtonUp(0))
         {
+            holeTarget = holeTransform.position;
             isDragging = false;
         }
     }
