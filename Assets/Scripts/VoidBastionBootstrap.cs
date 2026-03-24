@@ -181,7 +181,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         castleHpText = CreateText(hudPanel.transform, "Castle HP: 120/120", 30, TextAnchor.UpperRight, new Vector2(0.94f, 0.96f), new Vector2(360f, 70f));
         statusText = CreateText(hudPanel.transform, "Gather resources to empower the bastion.", 28, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.88f), new Vector2(860f, 80f));
 
-        sprintButton = CreateButton(hudPanel.transform, "Sprint", new Vector2(0.83f, 0.12f), new Vector2(220f, 110f));
+        sprintButton = CreateButton(hudPanel.transform, "Sprint", new Vector2(0.17f, 0.12f), new Vector2(220f, 110f));
         sprintButton.onClick.AddListener(TriggerSprint);
         sprintButtonText = sprintButton.GetComponentInChildren<Text>();
 
