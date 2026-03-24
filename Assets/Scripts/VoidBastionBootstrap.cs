@@ -1657,14 +1657,14 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             return;
         }
 
-        var material = renderer.sharedMaterial;
+        var material = renderer.material;
         var shader = GetRuntimeObjectShader();
         var isTransparent = color.a < 0.999f;
 
         if (material == null || material.shader != shader || IsTransparentMaterial(material) != isTransparent)
         {
             material = new Material(shader);
-            renderer.sharedMaterial = material;
+            renderer.material = material;
         }
 
         ConfigureRuntimeMaterial(material, color);
