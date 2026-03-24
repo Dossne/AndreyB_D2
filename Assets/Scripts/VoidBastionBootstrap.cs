@@ -63,13 +63,11 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private Button castleUpgradeButton;
     private Button holeUpgradeButton;
     private Button towerBuildButton;
-    private Button towerConfirmButton;
     private readonly List<Button> towerSlotButtons = new List<Button>();
     private readonly List<Text> towerSlotButtonTexts = new List<Text>();
     private Text castleUpgradeButtonText;
     private Text holeUpgradeButtonText;
     private Text towerBuildButtonText;
-    private Text towerConfirmButtonText;
 
     private bool soundEnabled = true;
     private bool gameStarted;
@@ -217,16 +215,13 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         upgradePanel = CreatePanel("Upgrade Panel", new Vector2(0.5f, 0.12f), new Vector2(940f, 250f), new Color(0f, 0f, 0f, 0f));
         castleUpgradeButton = CreateButton(upgradePanel.transform, "Castle Upgrade", new Vector2(0.2f, 0.3f), new Vector2(250f, 94f));
         holeUpgradeButton = CreateButton(upgradePanel.transform, "Hole Upgrade", new Vector2(0.5f, 0.3f), new Vector2(250f, 94f));
-        towerBuildButton = CreateButton(upgradePanel.transform, "Build Tower", new Vector2(0.72f, 0.3f), new Vector2(210f, 94f));
-        towerConfirmButton = CreateButton(upgradePanel.transform, "Confirm", new Vector2(0.91f, 0.3f), new Vector2(150f, 94f));
+        towerBuildButton = CreateButton(upgradePanel.transform, "Build Tower", new Vector2(0.8f, 0.3f), new Vector2(250f, 94f));
         castleUpgradeButton.onClick.AddListener(UpgradeCastle);
         holeUpgradeButton.onClick.AddListener(UpgradeHole);
         towerBuildButton.onClick.AddListener(BuildTower);
-        towerConfirmButton.onClick.AddListener(ConfirmTowerBuild);
         castleUpgradeButtonText = castleUpgradeButton.GetComponentInChildren<Text>();
         holeUpgradeButtonText = holeUpgradeButton.GetComponentInChildren<Text>();
         towerBuildButtonText = towerBuildButton.GetComponentInChildren<Text>();
-        towerConfirmButtonText = towerConfirmButton.GetComponentInChildren<Text>();
 
         var slotAnchors = new[]
         {
@@ -838,7 +833,6 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         if (!inUpgradeZone)
         {
             isChoosingTowerSpot = false;
-            towerConfirmButton.gameObject.SetActive(false);
             UpdateTowerSlotButtons();
             return;
         }
@@ -851,15 +845,15 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         holeUpgradeButtonText.text = "Hole +" + (holeUpgradeLevel + 1) + "\n" + FormatCost(holeCost);
         towerBuildButtonText.text = builtTowerCount >= TowerBuildPositions.Length
             ? "Towers Full"
-            : "Choose Spot";
-        towerConfirmButtonText.text = selectedSlotBuilt
-            ? "Spot Built"
-            : "Confirm\n" + FormatCost(towerCost);
+            : !isChoosingTowerSpot
+                ? "Build Tower\n" + FormatCost(towerCost)
+                : selectedSlotBuilt
+                    ? "Spot Built"
+                    : "Build Spot " + (selectedTowerSlotIndex + 1) + "\n" + FormatCost(towerCost);
         castleUpgradeButton.interactable = HasResources(castleCost);
         holeUpgradeButton.interactable = HasResources(holeCost);
-        towerBuildButton.interactable = builtTowerCount < TowerBuildPositions.Length;
-        towerConfirmButton.gameObject.SetActive(isChoosingTowerSpot && builtTowerCount < TowerBuildPositions.Length);
-        towerConfirmButton.interactable = isChoosingTowerSpot && !selectedSlotBuilt && HasResources(towerCost);
+        towerBuildButton.interactable = builtTowerCount < TowerBuildPositions.Length &&
+            (!isChoosingTowerSpot || (!selectedSlotBuilt && HasResources(towerCost)));
         UpdateTowerSlotButtons();
     }
 
@@ -1157,14 +1151,10 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             return;
         }
 
-        isChoosingTowerSpot = true;
-        UpdateTowerSlotButtons();
-    }
-
-    private void ConfirmTowerBuild()
-    {
-        if (!isChoosingTowerSpot || builtTowerCount >= TowerBuildPositions.Length)
+        if (!isChoosingTowerSpot)
         {
+            isChoosingTowerSpot = true;
+            UpdateTowerSlotButtons();
             return;
         }
 
