@@ -22,6 +22,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float ResourceScaleMin = 0.7f;
     private const float ResourceScaleStep = 0.1f;
     private const int ResourceScaleVariants = 6;
+    private const float StartingHoleRadius = ResourceScaleMin * 0.5f;
     private const int ResourceSpawnAttempts = 24;
     private const int TotalWaves = 15;
 
@@ -92,7 +93,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private int holeUpgradeLevel;
     private int builtTowerCount;
     private int selectedTowerSlotIndex;
-    private float holeRadius = 1.2f;
+    private float holeRadius = StartingHoleRadius;
     private float holeSpeed = 4.5f;
     private float currentSprintTime;
     private float sprintCooldownRemaining;
@@ -302,7 +303,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         castleUpgradeLevel = 0;
         holeUpgradeLevel = 0;
         builtTowerCount = 0;
-        holeRadius = 1.2f;
+        holeRadius = StartingHoleRadius;
         holeSpeed = 4.5f;
         currentSprintTime = 0f;
         sprintCooldownRemaining = 0f;
