@@ -664,6 +664,8 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private void UpdateAbsorption()
     {
+        var holeSizeTier = GetHoleSizeTier();
+
         for (int index = resourceNodes.Count - 1; index >= 0; index--)
         {
             var node = resourceNodes[index];
@@ -676,6 +678,11 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             var nodePosition = node.Transform.position;
             var direction = holeTransform.position - nodePosition;
             var distance = direction.magnitude;
+
+            if (node.SizeTier > holeSizeTier)
+            {
+                continue;
+            }
 
             if (distance <= holeRadius + 0.35f)
             {
@@ -789,6 +796,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         {
             ResourceType = type,
             Amount = 1 + resourceSizeIndex * 2,
+            SizeTier = resourceSizeIndex + 1,
             Transform = resourceObject.transform
         });
     }
@@ -1180,6 +1188,11 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             UpdateTowerActionButtons();
             return;
         }
+    }
+
+    private int GetHoleSizeTier()
+    {
+        return Mathf.Clamp(holeUpgradeLevel + 1, 1, ResourceScaleVariants);
     }
 
     private bool IsHoleInUpgradeZone()
@@ -1604,6 +1617,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     {
         public ResourceType ResourceType;
         public int Amount;
+        public int SizeTier;
         public Transform Transform;
     }
 
