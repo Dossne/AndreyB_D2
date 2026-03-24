@@ -768,7 +768,8 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var resourceObject = GameObject.CreatePrimitive(primitiveType);
         resourceObject.name = type + " Node";
         resourceObject.transform.SetParent(worldRoot);
-        var resourceScaleValue = ResourceScaleMin + Random.Range(0, ResourceScaleVariants) * ResourceScaleStep;
+        var resourceSizeIndex = Random.Range(0, ResourceScaleVariants);
+        var resourceScaleValue = ResourceScaleMin + resourceSizeIndex * ResourceScaleStep;
         var resourceScale = Vector3.one * resourceScaleValue;
         resourceObject.transform.localScale = resourceScale;
         var resourceRenderer = resourceObject.GetComponent<Renderer>();
@@ -786,7 +787,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         resourceNodes.Add(new ResourceNode
         {
             ResourceType = type,
-            Amount = type == ResourceType.Iron ? 3 : 5,
+            Amount = 1 + resourceSizeIndex * 2,
             Transform = resourceObject.transform
         });
     }
