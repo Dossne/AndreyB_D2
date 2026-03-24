@@ -17,6 +17,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float CameraFollowDepthOffset = -12f;
     private const float HoleCenterY = -0.22f;
     private const float ResourceHoverY = 1.2f;
+    private const int ResourceSpawnAttempts = 24;
     private const int TotalWaves = 15;
 
     private static readonly Vector3 CastlePosition = new Vector3(1.5f, 0f, 0f);
@@ -650,8 +651,9 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var resourceObject = GameObject.CreatePrimitive(primitiveType);
         resourceObject.name = type + " Node";
         resourceObject.transform.SetParent(worldRoot);
-        resourceObject.transform.position = new Vector3(Random.Range(minX, maxX), ResourceHoverY, Random.Range(-9f, 9f));
-        resourceObject.transform.localScale = Vector3.one * Random.Range(0.7f, 1.15f);
+        var resourceScale = Vector3.one * Random.Range(0.7f, 1.15f);
+        resourceObject.transform.localScale = resourceScale;
+        resourceObject.transform.position = FindResourceSpawnPosition(resourceScale.x, minX, maxX);
         resourceObject.GetComponent<Renderer>().material.color = color;
 
         var rigidbody = resourceObject.AddComponent<Rigidbody>();
@@ -668,6 +670,44 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             Amount = type == ResourceType.Iron ? 3 : 5,
             Transform = resourceObject.transform
         });
+    }
+
+    private Vector3 FindResourceSpawnPosition(float resourceSize, float minX, float maxX)
+    {
+        var fallbackPosition = new Vector3(Random.Range(minX, maxX), ResourceHoverY, Random.Range(-9f, 9f));
+
+        for (int attempt = 0; attempt < ResourceSpawnAttempts; attempt++)
+        {
+            var candidatePosition = new Vector3(Random.Range(minX, maxX), ResourceHoverY, Random.Range(-9f, 9f));
+            var overlapsExistingResource = false;
+
+            for (int index = 0; index < resourceNodes.Count; index++)
+            {
+                var existingTransform = resourceNodes[index].Transform;
+                if (existingTransform == null)
+                {
+                    continue;
+                }
+
+                var requiredDistance = (resourceSize + existingTransform.localScale.x) * 0.8f;
+                var candidateDistance = Vector2.Distance(
+                    new Vector2(candidatePosition.x, candidatePosition.z),
+                    new Vector2(existingTransform.position.x, existingTransform.position.z));
+
+                if (candidateDistance < requiredDistance)
+                {
+                    overlapsExistingResource = true;
+                    break;
+                }
+            }
+
+            if (!overlapsExistingResource)
+            {
+                return candidatePosition;
+            }
+        }
+
+        return fallbackPosition;
     }
 
     private void UpdateUpgradePanel()
