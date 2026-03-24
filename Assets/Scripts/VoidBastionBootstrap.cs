@@ -21,7 +21,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const int TotalWaves = 15;
 
     private static readonly Vector3 CastlePosition = new Vector3(1.5f, 0f, 0f);
-    private static readonly Vector3 HoleStartPosition = new Vector3(4.5f, HoleCenterY, -1.5f);
+    private static readonly Vector3 HoleStartPosition = new Vector3(11.5f, HoleCenterY, -1.5f);
 
     private readonly Dictionary<ResourceType, int> resources = new Dictionary<ResourceType, int>();
     private readonly List<ResourceNode> resourceNodes = new List<ResourceNode>();
