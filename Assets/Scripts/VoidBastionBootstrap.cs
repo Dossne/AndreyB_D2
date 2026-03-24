@@ -15,7 +15,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float ResourceRespawnInterval = 2.5f;
     private const float CameraFollowHeight = 12f;
     private const float CameraFollowDepthOffset = -12f;
-    private const float HoleCenterY = -0.22f;
+    private const float HoleCenterY = 0.15f;
     private const float GroundSurfaceY = -0.05f;
     private const int ResourceSpawnAttempts = 24;
     private const int TotalWaves = 15;
@@ -25,7 +25,6 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private readonly Dictionary<ResourceType, int> resources = new Dictionary<ResourceType, int>();
     private readonly List<ResourceNode> resourceNodes = new List<ResourceNode>();
-    private readonly List<FallingResource> fallingResources = new List<FallingResource>();
     private readonly List<EnemyUnit> enemies = new List<EnemyUnit>();
     private readonly List<DefenseTurret> turrets = new List<DefenseTurret>();
     private readonly List<TemporaryVisual> temporaryVisuals = new List<TemporaryVisual>();
@@ -34,9 +33,6 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private Camera mainCamera;
     private Transform holeTransform;
-    private Transform holeRimTransform;
-    private Transform holeVoidTransform;
-    private readonly List<Transform> holeWallTransforms = new List<Transform>();
     private Transform castleTransform;
     private Transform worldRoot;
     private Canvas uiCanvas;
@@ -122,7 +118,6 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         UpdateCameraFollow();
         UpdateSprintState();
         UpdateAbsorption();
-        UpdateFallingResources();
         UpdateResourceRespawn();
         UpdateWaveLoop();
         UpdateEnemies();
@@ -380,37 +375,13 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private void CreateHole()
     {
-        var holeObject = new GameObject("Player Hole");
+        var holeObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        holeObject.name = "Player Hole";
         holeObject.transform.SetParent(worldRoot);
         holeObject.transform.position = HoleStartPosition;
+        holeObject.GetComponent<Renderer>().material.color = new Color(0.05f, 0.05f, 0.07f);
+        Destroy(holeObject.GetComponent<Collider>());
         holeTransform = holeObject.transform;
-
-        holeWallTransforms.Clear();
-
-        var rimObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        rimObject.name = "Hole Bottom";
-        rimObject.transform.SetParent(holeTransform, false);
-        rimObject.GetComponent<Renderer>().material.color = new Color(0.03f, 0.03f, 0.04f);
-        Destroy(rimObject.GetComponent<Collider>());
-        holeRimTransform = rimObject.transform;
-
-        var voidObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        voidObject.name = "Hole Shaft";
-        voidObject.transform.SetParent(holeTransform, false);
-        voidObject.GetComponent<Renderer>().material.color = new Color(0.01f, 0.01f, 0.02f);
-        Destroy(voidObject.GetComponent<Collider>());
-        holeVoidTransform = voidObject.transform;
-
-        for (int index = 0; index < 12; index++)
-        {
-            var wallObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            wallObject.name = "Hole Wall " + index;
-            wallObject.transform.SetParent(holeTransform, false);
-            wallObject.GetComponent<Renderer>().material.color = new Color(0.08f, 0.08f, 0.1f);
-            Destroy(wallObject.GetComponent<Collider>());
-            holeWallTransforms.Add(wallObject.transform);
-        }
-
         holeTarget = holeTransform.position;
         UpdateHoleVisual();
         UpdateCameraFollow();
@@ -531,78 +502,16 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             var nodePosition = node.Transform.position;
             var direction = holeTransform.position - nodePosition;
             var distance = direction.magnitude;
-            var rigidbody = node.Transform.GetComponent<Rigidbody>();
-
-            var holeIsUnderResource =
-                Mathf.Abs(holeTransform.position.x - nodePosition.x) <= holeRadius * 0.75f &&
-                Mathf.Abs(holeTransform.position.z - nodePosition.z) <= holeRadius * 0.75f;
-
-            if (rigidbody != null && holeIsUnderResource && rigidbody.isKinematic)
-            {
-                rigidbody.isKinematic = false;
-                rigidbody.useGravity = true;
-            }
 
             if (distance <= holeRadius + 0.35f)
             {
-                if (rigidbody != null)
-                {
-                    rigidbody.isKinematic = true;
-                    rigidbody.useGravity = false;
-                    rigidbody.velocity = Vector3.zero;
-                    rigidbody.angularVelocity = Vector3.zero;
-                }
-
-                fallingResources.Add(new FallingResource
-                {
-                    Transform = node.Transform,
-                    ResourceType = node.ResourceType,
-                    Amount = node.Amount,
-                    StartPosition = node.Transform.position,
-                    StartScale = node.Transform.localScale,
-                    SpiralOffset = Random.Range(0f, 360f),
-                    Progress = 0f
-                });
+                resources[node.ResourceType] += node.Amount;
+                CreatePulseVisual(node.Transform.position + Vector3.up * 0.15f, new Color(0.9f, 0.94f, 0.55f));
+                Destroy(node.Transform.gameObject);
                 resourceNodes.RemoveAt(index);
                 continue;
             }
 
-        }
-    }
-
-    private void UpdateFallingResources()
-    {
-        for (int index = fallingResources.Count - 1; index >= 0; index--)
-        {
-            var fallingResource = fallingResources[index];
-            if (fallingResource.Transform == null)
-            {
-                fallingResources.RemoveAt(index);
-                continue;
-            }
-
-            fallingResource.Progress += Time.deltaTime * 3.2f;
-            var targetDepthPosition = holeTransform.position + new Vector3(0f, -1.02f, 0f);
-            var spiralAngle = fallingResource.SpiralOffset + fallingResource.Progress * 720f;
-            var spiralRadius = Mathf.Lerp(holeRadius * 0.62f, 0.01f, fallingResource.Progress);
-            var spiralOffset = new Vector3(
-                Mathf.Cos(spiralAngle * Mathf.Deg2Rad) * spiralRadius,
-                0f,
-                Mathf.Sin(spiralAngle * Mathf.Deg2Rad) * spiralRadius);
-
-            fallingResource.Transform.position = Vector3.Lerp(fallingResource.StartPosition, targetDepthPosition + spiralOffset, fallingResource.Progress);
-            fallingResource.Transform.localScale = Vector3.Lerp(fallingResource.StartScale, Vector3.zero, fallingResource.Progress);
-            fallingResource.Transform.Rotate(Vector3.up, 360f * Time.deltaTime, Space.World);
-
-            if (fallingResource.Progress < 1f)
-            {
-                continue;
-            }
-
-            resources[fallingResource.ResourceType] += fallingResource.Amount;
-            CreatePulseVisual(holeTransform.position + Vector3.up * 0.15f, new Color(0.9f, 0.94f, 0.55f));
-            Destroy(fallingResource.Transform.gameObject);
-            fallingResources.RemoveAt(index);
         }
     }
 
@@ -820,42 +729,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private void UpdateHoleVisual()
     {
-        if (holeTransform == null)
-        {
-            return;
-        }
-
-        if (holeRimTransform != null)
-        {
-            holeRimTransform.localPosition = new Vector3(0f, -0.92f, 0f);
-            holeRimTransform.localScale = new Vector3(holeRadius * 1.08f, 0.06f, holeRadius * 1.08f);
-        }
-
-        if (holeVoidTransform != null)
-        {
-            holeVoidTransform.localPosition = new Vector3(0f, -0.46f, 0f);
-            holeVoidTransform.localScale = new Vector3(holeRadius * 1.02f, 0.36f, holeRadius * 1.02f);
-        }
-
-        var wallDistance = holeRadius * 1.02f;
-        var wallHeight = 0.46f;
-        var wallThickness = holeRadius * 0.08f;
-        var wallLength = holeRadius * 0.54f;
-
-        for (int index = 0; index < holeWallTransforms.Count; index++)
-        {
-            var wallTransform = holeWallTransforms[index];
-            if (wallTransform == null)
-            {
-                continue;
-            }
-
-            var angle = index * (360f / holeWallTransforms.Count);
-            var direction = Quaternion.Euler(0f, angle, 0f) * Vector3.forward;
-            wallTransform.localPosition = new Vector3(direction.x * wallDistance, -0.46f, direction.z * wallDistance);
-            wallTransform.localRotation = Quaternion.Euler(0f, angle, 0f);
-            wallTransform.localScale = new Vector3(wallThickness, wallHeight, wallLength);
-        }
+        holeTransform.localScale = new Vector3(holeRadius * 2f, 0.18f, holeRadius * 2f);
     }
 
     private void UpdateCameraFollow()
@@ -1164,16 +1038,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             }
         }
 
-        for (int index = fallingResources.Count - 1; index >= 0; index--)
-        {
-            if (fallingResources[index].Transform != null)
-            {
-                Destroy(fallingResources[index].Transform.gameObject);
-            }
-        }
-
         enemies.Clear();
-        fallingResources.Clear();
         resourceNodes.Clear();
         turrets.Clear();
         temporaryVisuals.Clear();
@@ -1403,17 +1268,6 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         public ResourceType ResourceType;
         public int Amount;
         public Transform Transform;
-    }
-
-    private sealed class FallingResource
-    {
-        public Transform Transform;
-        public ResourceType ResourceType;
-        public int Amount;
-        public Vector3 StartPosition;
-        public Vector3 StartScale;
-        public float SpiralOffset;
-        public float Progress;
     }
 
     private sealed class EnemyUnit
