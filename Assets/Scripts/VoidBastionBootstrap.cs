@@ -302,6 +302,10 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private void CreateRoad()
     {
+        roadWaypoints.Add(new Vector3(-28f, 0f, -14f));
+        roadWaypoints.Add(new Vector3(-24f, 0f, -10f));
+        roadWaypoints.Add(new Vector3(-20f, 0f, -6.5f));
+        roadWaypoints.Add(new Vector3(-16f, 0f, -9f));
         roadWaypoints.Add(new Vector3(-14f, 0f, -7.5f));
         roadWaypoints.Add(new Vector3(-11f, 0f, -3.5f));
         roadWaypoints.Add(new Vector3(-8f, 0f, 0.5f));
