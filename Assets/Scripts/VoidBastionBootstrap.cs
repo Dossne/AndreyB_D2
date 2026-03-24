@@ -15,7 +15,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float WaveBreakDuration = 30f;
     private const float ResourceRespawnInterval = 2.5f;
     private const float CameraFollowHeight = 12f;
-    private const float CameraFollowDepthOffset = 12f;
+    private const float CameraFollowSideOffset = 12f;
     private const float HoleCenterY = 0.15f;
     private const float GroundSurfaceY = -0.05f;
     private const float ResourceAreaMinX = 10.5f;
@@ -144,8 +144,8 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
         mainCamera.orthographic = false;
         mainCamera.fieldOfView = 60f;
-        mainCamera.transform.position = new Vector3(CastlePosition.x, CameraFollowHeight, CastlePosition.z + CameraFollowDepthOffset);
-        mainCamera.transform.rotation = Quaternion.Euler(45f, 180f, 0f);
+        mainCamera.transform.position = new Vector3(CastlePosition.x + CameraFollowSideOffset, CameraFollowHeight, CastlePosition.z);
+        mainCamera.transform.rotation = Quaternion.Euler(45f, 270f, 0f);
         mainCamera.backgroundColor = new Color(0.72f, 0.88f, 0.96f);
         mainCamera.clearFlags = CameraClearFlags.SolidColor;
     }
@@ -834,9 +834,9 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         }
 
         mainCamera.transform.position = new Vector3(
-            holeTransform.position.x,
+            holeTransform.position.x + CameraFollowSideOffset,
             holeTransform.position.y + CameraFollowHeight,
-            holeTransform.position.z + CameraFollowDepthOffset);
+            holeTransform.position.z);
     }
 
     private void UpdateWaveLoop()
