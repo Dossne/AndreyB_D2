@@ -311,7 +311,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         castleMaxHp = 120f;
         castleHp = 120f;
         castleDamage = 2.2f;
-        castleRange = 7f;
+        castleRange = 10.5f;
         castleCooldown = 0.85f;
         nextSpawnTimer = 0f;
         waveBreakTimer = FirstWaveBreakDuration;
@@ -1273,7 +1273,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         turrets.Add(new DefenseTurret
         {
             Transform = towerObject.transform,
-            Range = 6.4f,
+            Range = 9.6f,
             Damage = 1.6f + builtTowerCount * 0.4f,
             Cooldown = 0.7f,
             VisualColor = new Color(0.55f, 0.9f, 1f)
