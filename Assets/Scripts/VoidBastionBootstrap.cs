@@ -9,7 +9,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float MapWidth = 60f;
     private const float MapHeight = 44f;
     private const float CastleZoneRadius = 3.25f;
-    private const float UpgradeZoneRadius = 3.5f;
+    private const float UpgradeZoneHalfSize = 7f;
     private const float SprintDuration = 1.5f;
     private const float SprintCooldown = 5f;
     private const float WaveBreakDuration = 30f;
@@ -413,11 +413,11 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         zoneObject.GetComponent<Renderer>().material.color = new Color(0.3f, 0.52f, 0.34f, 0.35f);
         Destroy(zoneObject.GetComponent<Collider>());
 
-        var upgradeZoneObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        var upgradeZoneObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
         upgradeZoneObject.name = "Upgrade Zone";
         upgradeZoneObject.transform.SetParent(worldRoot);
         upgradeZoneObject.transform.position = UpgradeZonePosition + new Vector3(0f, 0.01f, 0f);
-        upgradeZoneObject.transform.localScale = new Vector3(UpgradeZoneRadius * 2f, 0.01f, UpgradeZoneRadius * 2f);
+        upgradeZoneObject.transform.localScale = new Vector3(UpgradeZoneHalfSize * 2f, 0.02f, UpgradeZoneHalfSize * 2f);
         upgradeZoneObject.GetComponent<Renderer>().material.color = new Color(0.82f, 0.74f, 0.26f, 0.35f);
         Destroy(upgradeZoneObject.GetComponent<Collider>());
 
@@ -723,7 +723,10 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             return;
         }
 
-        var inUpgradeZone = Vector3.Distance(holeTransform.position, UpgradeZonePosition + new Vector3(0f, 0.15f, 0f)) <= UpgradeZoneRadius;
+        var upgradeOffset = holeTransform.position - (UpgradeZonePosition + new Vector3(0f, 0.15f, 0f));
+        var inUpgradeZone =
+            Mathf.Abs(upgradeOffset.x) <= UpgradeZoneHalfSize &&
+            Mathf.Abs(upgradeOffset.z) <= UpgradeZoneHalfSize;
         upgradePanel.SetActive(inUpgradeZone);
         if (!inUpgradeZone)
         {
