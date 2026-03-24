@@ -77,6 +77,8 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private Text towerBuildButtonText;
     private Text towerSpotBuildButtonText;
     private Text towerSpotCancelButtonText;
+    private AudioSource musicSource;
+    private AudioClip levelMusicClip;
 
     private bool soundEnabled = true;
     private bool gameStarted;
@@ -130,6 +132,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         resources[ResourceType.Iron] = 0;
 
         SetupCamera();
+        SetupMusic();
         SetupUi();
         ShowMenu();
     }
@@ -172,6 +175,22 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         mainCamera.transform.rotation = Quaternion.Euler(45f, 270f, 0f);
         mainCamera.backgroundColor = new Color(0.72f, 0.88f, 0.96f);
         mainCamera.clearFlags = CameraClearFlags.SolidColor;
+    }
+
+    private void SetupMusic()
+    {
+        levelMusicClip = Resources.Load<AudioClip>("Audio/oblivion_theme");
+        musicSource = GetComponent<AudioSource>();
+        if (musicSource == null)
+        {
+            musicSource = gameObject.AddComponent<AudioSource>();
+        }
+
+        musicSource.playOnAwake = false;
+        musicSource.loop = true;
+        musicSource.spatialBlend = 0f;
+        musicSource.clip = levelMusicClip;
+        musicSource.mute = !soundEnabled;
     }
 
     private void SetupUi()
@@ -281,6 +300,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         hudPanel.SetActive(false);
         upgradePanel.SetActive(false);
         endPanel.SetActive(false);
+        StopLevelMusic();
     }
 
     private void StartGame()
@@ -292,6 +312,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         endPanel.SetActive(false);
         BuildWorld();
         RefreshHud();
+        PlayLevelMusic();
     }
 
     private void ResetRuntimeState()
@@ -947,6 +968,10 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     {
         soundEnabled = !soundEnabled;
         soundToggle.Label.text = soundEnabled ? "Звук: Вкл" : "Звук: Выкл";
+        if (musicSource != null)
+        {
+            musicSource.mute = !soundEnabled;
+        }
     }
 
     private void UpdateHoleVisual()
@@ -1359,6 +1384,28 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         endBodyText.text = victory
             ? "Бастион Бездны выстоял все 15 волн."
             : "Замок пал на волне " + Mathf.Max(1, waveNumber) + ".";
+    }
+
+    private void PlayLevelMusic()
+    {
+        if (musicSource == null || levelMusicClip == null)
+        {
+            return;
+        }
+
+        musicSource.mute = !soundEnabled;
+        if (!musicSource.isPlaying)
+        {
+            musicSource.Play();
+        }
+    }
+
+    private void StopLevelMusic()
+    {
+        if (musicSource != null && musicSource.isPlaying)
+        {
+            musicSource.Stop();
+        }
     }
 
     private void RestartGame()
