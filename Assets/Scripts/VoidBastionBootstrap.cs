@@ -19,6 +19,9 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float HoleCenterY = 0.15f;
     private const float GroundSurfaceY = -0.05f;
     private const float ResourceAreaMinX = 10.5f;
+    private const float ResourceScaleMin = 0.7f;
+    private const float ResourceScaleStep = 0.1f;
+    private const int ResourceScaleVariants = 6;
     private const int ResourceSpawnAttempts = 24;
     private const int TotalWaves = 15;
 
@@ -765,7 +768,8 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var resourceObject = GameObject.CreatePrimitive(primitiveType);
         resourceObject.name = type + " Node";
         resourceObject.transform.SetParent(worldRoot);
-        var resourceScale = Vector3.one * Random.Range(0.7f, 1.15f);
+        var resourceScaleValue = ResourceScaleMin + Random.Range(0, ResourceScaleVariants) * ResourceScaleStep;
+        var resourceScale = Vector3.one * resourceScaleValue;
         resourceObject.transform.localScale = resourceScale;
         var resourceRenderer = resourceObject.GetComponent<Renderer>();
         resourceObject.transform.position = FindResourceSpawnPosition(resourceScale.x, minX, maxX, minZ, maxZ, GroundSurfaceY + resourceRenderer.bounds.extents.y);
