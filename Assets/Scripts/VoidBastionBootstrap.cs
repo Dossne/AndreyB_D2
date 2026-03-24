@@ -32,7 +32,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private readonly List<DefenseTurret> turrets = new List<DefenseTurret>();
     private readonly List<TemporaryVisual> temporaryVisuals = new List<TemporaryVisual>();
     private readonly List<Bounds> mountainBounds = new List<Bounds>();
-    private readonly List<Vector3> roadWaypoints = new List<Vector3>();
+    private readonly List<List<Vector3>> roadPaths = new List<List<Vector3>>();
 
     private Camera mainCamera;
     private Transform holeTransform;
@@ -279,7 +279,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
         resourceNodes.Clear();
         mountainBounds.Clear();
-        roadWaypoints.Clear();
+        roadPaths.Clear();
 
         worldRoot = new GameObject("Runtime World").transform;
         CreateGround();
@@ -302,32 +302,78 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private void CreateRoad()
     {
-        roadWaypoints.Add(new Vector3(-28f, 0f, -14f));
-        roadWaypoints.Add(new Vector3(-24f, 0f, -10f));
-        roadWaypoints.Add(new Vector3(-20f, 0f, -6.5f));
-        roadWaypoints.Add(new Vector3(-16f, 0f, -9f));
-        roadWaypoints.Add(new Vector3(-14f, 0f, -7.5f));
-        roadWaypoints.Add(new Vector3(-11f, 0f, -3.5f));
-        roadWaypoints.Add(new Vector3(-8f, 0f, 0.5f));
-        roadWaypoints.Add(new Vector3(-5f, 0f, 3.5f));
-        roadWaypoints.Add(new Vector3(-1.5f, 0f, 2f));
-        roadWaypoints.Add(new Vector3(1.5f, 0f, 0f));
-
-        for (int index = 0; index < roadWaypoints.Count - 1; index++)
+        roadPaths.Add(new List<Vector3>
         {
-            var from = roadWaypoints[index];
-            var to = roadWaypoints[index + 1];
-            var midpoint = (from + to) * 0.5f + new Vector3(0f, 0.02f, 0f);
-            var length = Vector3.Distance(from, to);
+            new Vector3(-28f, 0f, -14f),
+            new Vector3(-24f, 0f, -10f),
+            new Vector3(-20f, 0f, -6.5f),
+            new Vector3(-16f, 0f, -9f),
+            new Vector3(-14f, 0f, -7.5f),
+            new Vector3(-11f, 0f, -3.5f),
+            new Vector3(-8f, 0f, 0.5f),
+            new Vector3(-5f, 0f, 3.5f),
+            new Vector3(-1.5f, 0f, 2f),
+            new Vector3(1.5f, 0f, 0f)
+        });
 
-            var roadObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            roadObject.name = "Road Segment";
-            roadObject.transform.SetParent(worldRoot);
-            roadObject.transform.position = midpoint;
-            roadObject.transform.localScale = new Vector3(2.4f, 0.08f, length);
-            roadObject.transform.rotation = Quaternion.LookRotation(to - from);
-            roadObject.GetComponent<Renderer>().material.color = new Color(0.45f, 0.28f, 0.12f);
-            Destroy(roadObject.GetComponent<Collider>());
+        roadPaths.Add(new List<Vector3>
+        {
+            new Vector3(-28f, 0f, -4f),
+            new Vector3(-24f, 0f, -2f),
+            new Vector3(-21f, 0f, 2.5f),
+            new Vector3(-17f, 0f, 6f),
+            new Vector3(-13f, 0f, 8f),
+            new Vector3(-9f, 0f, 7.5f),
+            new Vector3(-5f, 0f, 5f),
+            new Vector3(-2f, 0f, 2f),
+            new Vector3(1.5f, 0f, 0f)
+        });
+
+        roadPaths.Add(new List<Vector3>
+        {
+            new Vector3(-28f, 0f, 6f),
+            new Vector3(-25f, 0f, 10f),
+            new Vector3(-22f, 0f, 14f),
+            new Vector3(-18f, 0f, 12f),
+            new Vector3(-14f, 0f, 9f),
+            new Vector3(-10f, 0f, 6f),
+            new Vector3(-6f, 0f, 3f),
+            new Vector3(-2f, 0f, 1.5f),
+            new Vector3(1.5f, 0f, 0f)
+        });
+
+        roadPaths.Add(new List<Vector3>
+        {
+            new Vector3(-28f, 0f, 16f),
+            new Vector3(-24f, 0f, 14f),
+            new Vector3(-20f, 0f, 10f),
+            new Vector3(-16f, 0f, 8.5f),
+            new Vector3(-12f, 0f, 6f),
+            new Vector3(-8f, 0f, 4f),
+            new Vector3(-4f, 0f, 2.5f),
+            new Vector3(-1f, 0f, 1f),
+            new Vector3(1.5f, 0f, 0f)
+        });
+
+        for (int pathIndex = 0; pathIndex < roadPaths.Count; pathIndex++)
+        {
+            var path = roadPaths[pathIndex];
+            for (int index = 0; index < path.Count - 1; index++)
+            {
+                var from = path[index];
+                var to = path[index + 1];
+                var midpoint = (from + to) * 0.5f + new Vector3(0f, 0.02f, 0f);
+                var length = Vector3.Distance(from, to);
+
+                var roadObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                roadObject.name = "Road Segment";
+                roadObject.transform.SetParent(worldRoot);
+                roadObject.transform.position = midpoint;
+                roadObject.transform.localScale = new Vector3(2.4f, 0.08f, length);
+                roadObject.transform.rotation = Quaternion.LookRotation(to - from);
+                roadObject.GetComponent<Renderer>().material.color = new Color(0.45f, 0.28f, 0.12f);
+                Destroy(roadObject.GetComponent<Collider>());
+            }
         }
     }
 
@@ -892,10 +938,12 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private void SpawnEnemy()
     {
+        var pathIndex = Random.Range(0, roadPaths.Count);
+        var path = roadPaths[pathIndex];
         var enemyObject = GameObject.CreatePrimitive(PrimitiveType.Capsule);
         enemyObject.name = "Enemy";
         enemyObject.transform.SetParent(worldRoot);
-        enemyObject.transform.position = roadWaypoints[0] + new Vector3(0f, 0.6f, 0f);
+        enemyObject.transform.position = path[0] + new Vector3(0f, 0.6f, 0f);
         enemyObject.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
         enemyObject.GetComponent<Renderer>().material.color = new Color(0.78f, 0.2f, 0.2f);
 
@@ -906,6 +954,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             MaxHitPoints = 4f + waveNumber * 1.15f,
             Speed = 1.45f + waveNumber * 0.06f,
             Damage = 6f + waveNumber,
+            PathIndex = pathIndex,
             WaypointIndex = 1
         });
     }
@@ -915,13 +964,14 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         for (int index = enemies.Count - 1; index >= 0; index--)
         {
             var enemy = enemies[index];
+            var path = roadPaths[enemy.PathIndex];
             if (enemy.Transform == null)
             {
                 enemies.RemoveAt(index);
                 continue;
             }
 
-            if (enemy.WaypointIndex >= roadWaypoints.Count)
+            if (enemy.WaypointIndex >= path.Count)
             {
                 castleHp -= enemy.Damage;
                 CreatePulseVisual(CastlePosition + Vector3.up, new Color(1f, 0.4f, 0.35f));
@@ -937,7 +987,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
                 continue;
             }
 
-            var target = roadWaypoints[enemy.WaypointIndex] + new Vector3(0f, 0.6f, 0f);
+            var target = path[enemy.WaypointIndex] + new Vector3(0f, 0.6f, 0f);
             enemy.Transform.position = Vector3.MoveTowards(enemy.Transform.position, target, enemy.Speed * Time.deltaTime);
             enemy.Transform.LookAt(target);
 
@@ -1374,6 +1424,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         public float MaxHitPoints;
         public float Speed;
         public float Damage;
+        public int PathIndex;
         public int WaypointIndex;
     }
 
