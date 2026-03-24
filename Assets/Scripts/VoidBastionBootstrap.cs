@@ -15,7 +15,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float ResourceRespawnInterval = 2.5f;
     private const float CameraFollowHeight = 12f;
     private const float CameraFollowDepthOffset = -12f;
-    private const float HoleCenterY = -0.21f;
+    private const float HoleCenterY = -0.22f;
     private const float ResourceHoverY = 1.4f;
     private const int TotalWaves = 15;
 
