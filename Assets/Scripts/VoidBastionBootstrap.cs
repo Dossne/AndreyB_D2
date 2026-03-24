@@ -34,6 +34,9 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private Camera mainCamera;
     private Transform holeTransform;
+    private Transform holeRimTransform;
+    private Transform holeVoidTransform;
+    private readonly List<Transform> holeWallTransforms = new List<Transform>();
     private Transform castleTransform;
     private Transform worldRoot;
     private Canvas uiCanvas;
@@ -377,12 +380,37 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private void CreateHole()
     {
-        var holeObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        holeObject.name = "Player Hole";
+        var holeObject = new GameObject("Player Hole");
         holeObject.transform.SetParent(worldRoot);
         holeObject.transform.position = HoleStartPosition;
-        holeObject.GetComponent<Renderer>().material.color = new Color(0.05f, 0.05f, 0.07f);
         holeTransform = holeObject.transform;
+
+        holeWallTransforms.Clear();
+
+        var rimObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        rimObject.name = "Hole Rim";
+        rimObject.transform.SetParent(holeTransform, false);
+        rimObject.GetComponent<Renderer>().material.color = new Color(0.06f, 0.06f, 0.08f);
+        Destroy(rimObject.GetComponent<Collider>());
+        holeRimTransform = rimObject.transform;
+
+        var voidObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        voidObject.name = "Hole Void";
+        voidObject.transform.SetParent(holeTransform, false);
+        voidObject.GetComponent<Renderer>().material.color = new Color(0.01f, 0.01f, 0.02f);
+        Destroy(voidObject.GetComponent<Collider>());
+        holeVoidTransform = voidObject.transform;
+
+        for (int index = 0; index < 4; index++)
+        {
+            var wallObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            wallObject.name = "Hole Wall " + index;
+            wallObject.transform.SetParent(holeTransform, false);
+            wallObject.GetComponent<Renderer>().material.color = new Color(0.08f, 0.08f, 0.1f);
+            Destroy(wallObject.GetComponent<Collider>());
+            holeWallTransforms.Add(wallObject.transform);
+        }
+
         holeTarget = holeTransform.position;
         UpdateHoleVisual();
         UpdateCameraFollow();
@@ -530,7 +558,9 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
                     Transform = node.Transform,
                     ResourceType = node.ResourceType,
                     Amount = node.Amount,
+                    StartPosition = node.Transform.position,
                     StartScale = node.Transform.localScale,
+                    SpiralOffset = Random.Range(0f, 360f),
                     Progress = 0f
                 });
                 resourceNodes.RemoveAt(index);
@@ -552,9 +582,17 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             }
 
             fallingResource.Progress += Time.deltaTime * 3.2f;
-            var targetPosition = holeTransform.position + new Vector3(0f, -0.45f, 0f);
-            fallingResource.Transform.position = Vector3.Lerp(fallingResource.Transform.position, targetPosition, fallingResource.Progress);
+            var targetDepthPosition = holeTransform.position + new Vector3(0f, -0.72f, 0f);
+            var spiralAngle = fallingResource.SpiralOffset + fallingResource.Progress * 720f;
+            var spiralRadius = Mathf.Lerp(holeRadius * 0.38f, 0.02f, fallingResource.Progress);
+            var spiralOffset = new Vector3(
+                Mathf.Cos(spiralAngle * Mathf.Deg2Rad) * spiralRadius,
+                0f,
+                Mathf.Sin(spiralAngle * Mathf.Deg2Rad) * spiralRadius);
+
+            fallingResource.Transform.position = Vector3.Lerp(fallingResource.StartPosition, targetDepthPosition + spiralOffset, fallingResource.Progress);
             fallingResource.Transform.localScale = Vector3.Lerp(fallingResource.StartScale, Vector3.zero, fallingResource.Progress);
+            fallingResource.Transform.Rotate(Vector3.up, 360f * Time.deltaTime, Space.World);
 
             if (fallingResource.Progress < 1f)
             {
@@ -782,7 +820,42 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private void UpdateHoleVisual()
     {
-        holeTransform.localScale = new Vector3(holeRadius * 2f, 0.18f, holeRadius * 2f);
+        if (holeTransform == null)
+        {
+            return;
+        }
+
+        if (holeRimTransform != null)
+        {
+            holeRimTransform.localPosition = new Vector3(0f, 0f, 0f);
+            holeRimTransform.localScale = new Vector3(holeRadius * 2f, 0.09f, holeRadius * 2f);
+        }
+
+        if (holeVoidTransform != null)
+        {
+            holeVoidTransform.localPosition = new Vector3(0f, -0.32f, 0f);
+            holeVoidTransform.localScale = new Vector3(holeRadius * 1.55f, 0.42f, holeRadius * 1.55f);
+        }
+
+        var wallDistance = holeRadius * 0.42f;
+        var wallHeight = 0.34f;
+        var wallThickness = holeRadius * 0.18f;
+        var wallLength = holeRadius * 1.35f;
+
+        for (int index = 0; index < holeWallTransforms.Count; index++)
+        {
+            var wallTransform = holeWallTransforms[index];
+            if (wallTransform == null)
+            {
+                continue;
+            }
+
+            var angle = index * 90f;
+            var direction = Quaternion.Euler(0f, angle, 0f) * Vector3.forward;
+            wallTransform.localPosition = new Vector3(direction.x * wallDistance, -0.18f, direction.z * wallDistance);
+            wallTransform.localRotation = Quaternion.Euler(22f, angle, 0f);
+            wallTransform.localScale = new Vector3(wallThickness, wallHeight, wallLength);
+        }
     }
 
     private void UpdateCameraFollow()
@@ -1337,7 +1410,9 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         public Transform Transform;
         public ResourceType ResourceType;
         public int Amount;
+        public Vector3 StartPosition;
         public Vector3 StartScale;
+        public float SpiralOffset;
         public float Progress;
     }
 
