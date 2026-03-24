@@ -323,17 +323,18 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
     private void CreateMountains()
     {
-        var mountainData = new[]
-        {
-            new MountainData(new Vector3(5.2f, 0.7f, -9f), new Vector3(3f, 1.6f, 3f)),
-            new MountainData(new Vector3(5.2f, 0.7f, -5.5f), new Vector3(3f, 1.6f, 3f)),
-            new MountainData(new Vector3(5.2f, 0.7f, 5.5f), new Vector3(3f, 1.6f, 3f)),
-            new MountainData(new Vector3(5.2f, 0.7f, 9f), new Vector3(3f, 1.6f, 3f)),
-            new MountainData(new Vector3(7.8f, 0.7f, -7.3f), new Vector3(3f, 1.6f, 3f)),
-            new MountainData(new Vector3(7.8f, 0.7f, 7.3f), new Vector3(3f, 1.6f, 3f))
-        };
+        var mountainSegments = new List<MountainData>();
+        var minZ = -MapHeight * 0.5f + 1.5f;
+        var maxZ = MapHeight * 0.5f - 1.5f;
+        var segmentSpacing = 3f;
 
-        foreach (var mountain in mountainData)
+        for (var z = minZ; z <= maxZ; z += segmentSpacing)
+        {
+            mountainSegments.Add(new MountainData(new Vector3(5.2f, 0.7f, z), new Vector3(3f, 1.6f, 3f)));
+            mountainSegments.Add(new MountainData(new Vector3(7.8f, 0.7f, z + segmentSpacing * 0.5f), new Vector3(3f, 1.6f, 3f)));
+        }
+
+        foreach (var mountain in mountainSegments)
         {
             var mountainObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
             mountainObject.name = "Mountain";
