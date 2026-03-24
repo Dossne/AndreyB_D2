@@ -263,8 +263,10 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         endPanel = CreatePanel("End Panel", new Vector2(0.5f, 0.5f), new Vector2(720f, 620f), new Color(0.05f, 0.08f, 0.12f, 0.9f));
         endTitleText = CreateText(endPanel.transform, string.Empty, 68, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.72f), new Vector2(520f, 100f));
         endBodyText = CreateText(endPanel.transform, string.Empty, 34, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.48f), new Vector2(560f, 180f));
-        var restartButton = CreateButton(endPanel.transform, "Restart", new Vector2(0.5f, 0.18f), new Vector2(320f, 110f));
+        var restartButton = CreateButton(endPanel.transform, "Restart", new Vector2(0.32f, 0.18f), new Vector2(260f, 110f));
         restartButton.onClick.AddListener(RestartGame);
+        var menuButton = CreateButton(endPanel.transform, "Menu", new Vector2(0.68f, 0.18f), new Vector2(260f, 110f));
+        menuButton.onClick.AddListener(ReturnToMenu);
 
         hudPanel.SetActive(false);
         upgradePanel.SetActive(false);
@@ -1362,6 +1364,25 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private void RestartGame()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private void ReturnToMenu()
+    {
+        gameStarted = false;
+        gameEnded = false;
+        isDragging = false;
+        isChoosingTowerSpot = false;
+
+        if (worldRoot != null)
+        {
+            Destroy(worldRoot.gameObject);
+            worldRoot = null;
+        }
+
+        holeTransform = null;
+        castleTransform = null;
+        ClearEntities();
+        ShowMenu();
     }
 
     private void ClearEntities()
