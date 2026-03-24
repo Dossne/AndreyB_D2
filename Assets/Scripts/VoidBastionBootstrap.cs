@@ -73,6 +73,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private bool gameStarted;
     private bool gameEnded;
     private bool isDragging;
+    private bool isChoosingTowerSpot;
     private bool sprintHiddenByUpgradeZone;
     private bool sprintActive;
     private readonly bool[] builtTowerSlots = new bool[TowerBuildPositions.Length];
@@ -296,6 +297,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         waveBreakTimer = 3f;
         resourceRespawnTimer = ResourceRespawnInterval;
         selectedTowerSlotIndex = 0;
+        isChoosingTowerSpot = false;
         cameraVelocity = Vector3.zero;
 
         resources[ResourceType.Wood] = 0;
@@ -830,6 +832,8 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         SetSprintVisibility(!inUpgradeZone);
         if (!inUpgradeZone)
         {
+            isChoosingTowerSpot = false;
+            UpdateTowerSlotButtons();
             return;
         }
 
@@ -841,12 +845,15 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         holeUpgradeButtonText.text = "Hole +" + (holeUpgradeLevel + 1) + "\n" + FormatCost(holeCost);
         towerBuildButtonText.text = builtTowerCount >= TowerBuildPositions.Length
             ? "Towers Full"
-            : selectedSlotBuilt
-                ? "Spot Built"
-                : "Build Spot " + (selectedTowerSlotIndex + 1) + "\n" + FormatCost(towerCost);
+            : !isChoosingTowerSpot
+                ? "Build Tower\n" + FormatCost(towerCost)
+                : selectedSlotBuilt
+                    ? "Spot Built"
+                    : "Build Spot " + (selectedTowerSlotIndex + 1) + "\n" + FormatCost(towerCost);
         castleUpgradeButton.interactable = HasResources(castleCost);
         holeUpgradeButton.interactable = HasResources(holeCost);
-        towerBuildButton.interactable = builtTowerCount < TowerBuildPositions.Length && !selectedSlotBuilt && HasResources(towerCost);
+        towerBuildButton.interactable = builtTowerCount < TowerBuildPositions.Length &&
+            (!isChoosingTowerSpot || (!selectedSlotBuilt && HasResources(towerCost)));
         UpdateTowerSlotButtons();
     }
 
@@ -923,7 +930,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         }
 
         var focusPosition = holeTransform.position;
-        if (IsHoleInUpgradeZone())
+        if (IsHoleInUpgradeZone() && isChoosingTowerSpot)
         {
             focusPosition = TowerBuildPositions[selectedTowerSlotIndex];
         }
@@ -1144,6 +1151,13 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             return;
         }
 
+        if (!isChoosingTowerSpot)
+        {
+            isChoosingTowerSpot = true;
+            UpdateTowerSlotButtons();
+            return;
+        }
+
         var cost = GetTowerBuildCost();
         if (!HasResources(cost) || builtTowerSlots[selectedTowerSlotIndex])
         {
@@ -1169,6 +1183,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
         builtTowerSlots[selectedTowerSlotIndex] = true;
         builtTowerCount++;
+        isChoosingTowerSpot = false;
         UpdateTowerSlotButtons();
     }
 
@@ -1206,8 +1221,9 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             var slotSelected = index == selectedTowerSlotIndex;
             var slotImage = slotButton.GetComponent<Image>();
 
+            slotButton.gameObject.SetActive(isChoosingTowerSpot);
             slotText.text = slotBuilt ? "Built" : "Spot " + (index + 1);
-            slotButton.interactable = !slotBuilt;
+            slotButton.interactable = isChoosingTowerSpot && !slotBuilt;
 
             if (slotImage != null)
             {
