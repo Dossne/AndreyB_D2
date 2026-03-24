@@ -17,6 +17,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float CameraFollowDepthOffset = -12f;
     private const float HoleCenterY = 0.15f;
     private const float GroundSurfaceY = -0.05f;
+    private const float ResourceAreaMinX = 10.5f;
     private const int ResourceSpawnAttempts = 24;
     private const int TotalWaves = 15;
 
@@ -619,30 +620,27 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     {
         PrimitiveType primitiveType;
         Color color;
-        float minX;
-        float maxX;
 
         switch (type)
         {
             case ResourceType.Wood:
                 primitiveType = PrimitiveType.Capsule;
                 color = new Color(0.24f, 0.52f, 0.18f);
-                minX = 7.5f;
-                maxX = 13f;
                 break;
             case ResourceType.Stone:
                 primitiveType = PrimitiveType.Cube;
                 color = new Color(0.56f, 0.58f, 0.62f);
-                minX = 8.5f;
-                maxX = 14f;
                 break;
             default:
                 primitiveType = PrimitiveType.Sphere;
                 color = new Color(0.5f, 0.42f, 0.26f);
-                minX = 10f;
-                maxX = 14f;
                 break;
         }
+
+        var minX = ResourceAreaMinX;
+        var maxX = MapWidth * 0.5f - 1.5f;
+        var minZ = -MapHeight * 0.5f + 1.5f;
+        var maxZ = MapHeight * 0.5f - 1.5f;
 
         var resourceObject = GameObject.CreatePrimitive(primitiveType);
         resourceObject.name = type + " Node";
@@ -650,7 +648,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var resourceScale = Vector3.one * Random.Range(0.7f, 1.15f);
         resourceObject.transform.localScale = resourceScale;
         var resourceRenderer = resourceObject.GetComponent<Renderer>();
-        resourceObject.transform.position = FindResourceSpawnPosition(resourceScale.x, minX, maxX, GroundSurfaceY + resourceRenderer.bounds.extents.y);
+        resourceObject.transform.position = FindResourceSpawnPosition(resourceScale.x, minX, maxX, minZ, maxZ, GroundSurfaceY + resourceRenderer.bounds.extents.y);
         resourceRenderer.material.color = color;
 
         var rigidbody = resourceObject.AddComponent<Rigidbody>();
@@ -669,13 +667,13 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         });
     }
 
-    private Vector3 FindResourceSpawnPosition(float resourceSize, float minX, float maxX, float spawnY)
+    private Vector3 FindResourceSpawnPosition(float resourceSize, float minX, float maxX, float minZ, float maxZ, float spawnY)
     {
-        var fallbackPosition = new Vector3(Random.Range(minX, maxX), spawnY, Random.Range(-9f, 9f));
+        var fallbackPosition = new Vector3(Random.Range(minX, maxX), spawnY, Random.Range(minZ, maxZ));
 
         for (int attempt = 0; attempt < ResourceSpawnAttempts; attempt++)
         {
-            var candidatePosition = new Vector3(Random.Range(minX, maxX), spawnY, Random.Range(-9f, 9f));
+            var candidatePosition = new Vector3(Random.Range(minX, maxX), spawnY, Random.Range(minZ, maxZ));
             var overlapsExistingResource = false;
 
             for (int index = 0; index < resourceNodes.Count; index++)
