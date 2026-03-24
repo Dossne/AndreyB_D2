@@ -236,7 +236,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         var resourcePanel = CreatePanel("Resource Panel", new Vector2(0.1385f, 0.8985f), new Vector2(300f, 170f), new Color(0f, 0f, 0f, 0f));
         resourcePanel.transform.SetParent(hudPanel.transform, false);
         resourceText = CreateText(resourcePanel.transform, string.Empty, 28, TextAnchor.UpperLeft, new Vector2(0.5f, 0.5f), new Vector2(250f, 130f));
-        waveText = CreateText(hudPanel.transform, "Волна: 0/15", 30, TextAnchor.UpperCenter, new Vector2(0.5f, 0.96f), new Vector2(260f, 70f));
+        waveText = CreateText(hudPanel.transform, "Волна: 0/15", 30, TextAnchor.UpperCenter, new Vector2(0.5f, 0.944f), new Vector2(260f, 70f));
         castleHpText = CreateText(hudPanel.transform, "HP замка: 120/120", 30, TextAnchor.UpperRight, new Vector2(0.8289f, 0.934f), new Vector2(360f, 70f));
         statusText = CreateText(hudPanel.transform, "Собирайте ресурсы, чтобы усилить бастион.", 28, TextAnchor.MiddleCenter, new Vector2(0.5f, 0.88f), new Vector2(860f, 80f));
 
