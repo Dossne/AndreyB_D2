@@ -16,7 +16,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
     private const float CameraFollowHeight = 12f;
     private const float CameraFollowDepthOffset = -12f;
     private const float HoleCenterY = -0.22f;
-    private const float ResourceHoverY = 1.2f;
+    private const float GroundSurfaceY = -0.05f;
     private const int ResourceSpawnAttempts = 24;
     private const int TotalWaves = 15;
 
@@ -653,8 +653,9 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         resourceObject.transform.SetParent(worldRoot);
         var resourceScale = Vector3.one * Random.Range(0.7f, 1.15f);
         resourceObject.transform.localScale = resourceScale;
-        resourceObject.transform.position = FindResourceSpawnPosition(resourceScale.x, minX, maxX);
-        resourceObject.GetComponent<Renderer>().material.color = color;
+        var resourceRenderer = resourceObject.GetComponent<Renderer>();
+        resourceObject.transform.position = FindResourceSpawnPosition(resourceScale.x, minX, maxX, GroundSurfaceY + resourceRenderer.bounds.extents.y);
+        resourceRenderer.material.color = color;
 
         var rigidbody = resourceObject.AddComponent<Rigidbody>();
         rigidbody.mass = 0.35f;
@@ -672,13 +673,13 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         });
     }
 
-    private Vector3 FindResourceSpawnPosition(float resourceSize, float minX, float maxX)
+    private Vector3 FindResourceSpawnPosition(float resourceSize, float minX, float maxX, float spawnY)
     {
-        var fallbackPosition = new Vector3(Random.Range(minX, maxX), ResourceHoverY, Random.Range(-9f, 9f));
+        var fallbackPosition = new Vector3(Random.Range(minX, maxX), spawnY, Random.Range(-9f, 9f));
 
         for (int attempt = 0; attempt < ResourceSpawnAttempts; attempt++)
         {
-            var candidatePosition = new Vector3(Random.Range(minX, maxX), ResourceHoverY, Random.Range(-9f, 9f));
+            var candidatePosition = new Vector3(Random.Range(minX, maxX), spawnY, Random.Range(-9f, 9f));
             var overlapsExistingResource = false;
 
             for (int index = 0; index < resourceNodes.Count; index++)
