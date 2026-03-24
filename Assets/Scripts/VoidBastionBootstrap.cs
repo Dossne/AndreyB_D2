@@ -336,13 +336,13 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
 
         foreach (var mountain in mountainSegments)
         {
-            var mountainObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            var mountainObject = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             mountainObject.name = "Mountain";
             mountainObject.transform.SetParent(worldRoot);
             mountainObject.transform.position = mountain.Position;
-            mountainObject.transform.localScale = mountain.Size;
+            mountainObject.transform.localScale = new Vector3(mountain.Size.x * 0.5f, mountain.Size.y, mountain.Size.z * 0.5f);
             mountainObject.GetComponent<Renderer>().material.color = new Color(0.4f, 0.4f, 0.45f);
-            mountainBounds.Add(new Bounds(mountain.Position, mountain.Size));
+            mountainBounds.Add(new Bounds(mountain.Position, new Vector3(mountain.Size.x * 0.75f, mountain.Size.y, mountain.Size.z * 0.75f)));
         }
     }
 
