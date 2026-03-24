@@ -271,8 +271,8 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
             towerSlotButtonTexts.Add(towerSlotButton.GetComponentInChildren<Text>());
         }
 
-        towerSpotBuildButton = CreateButton(hudPanel.transform, "Построить", new Vector2(0.5f, 0.5f), new Vector2(120f, 56f));
-        towerSpotCancelButton = CreateButton(hudPanel.transform, "Отмена", new Vector2(0.5f, 0.5f), new Vector2(120f, 56f));
+        towerSpotBuildButton = CreateButton(uiCanvas.transform, "Построить", new Vector2(0.5f, 0.5f), new Vector2(120f, 56f));
+        towerSpotCancelButton = CreateButton(uiCanvas.transform, "Отмена", new Vector2(0.5f, 0.5f), new Vector2(120f, 56f));
         towerSpotBuildButton.onClick.AddListener(ConfirmTowerBuild);
         towerSpotCancelButton.onClick.AddListener(CancelTowerBuild);
         towerSpotBuildButtonText = towerSpotBuildButton.GetComponentInChildren<Text>();
@@ -1340,6 +1340,9 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         {
             return;
         }
+
+        towerSpotBuildButton.transform.SetAsLastSibling();
+        towerSpotCancelButton.transform.SetAsLastSibling();
 
         var selectedSlotBuilt = builtTowerSlots[selectedTowerSlotIndex];
         var towerCost = GetTowerBuildCost();
