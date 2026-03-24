@@ -196,7 +196,7 @@ public sealed class VoidBastionBootstrap : MonoBehaviour
         sprintButton.onClick.AddListener(TriggerSprint);
         sprintButtonText = sprintButton.GetComponentInChildren<Text>();
 
-        upgradePanel = CreatePanel("Upgrade Panel", new Vector2(0.5f, 0.12f), new Vector2(940f, 190f), new Color(0.1f, 0.18f, 0.12f, 0.88f));
+        upgradePanel = CreatePanel("Upgrade Panel", new Vector2(0.5f, 0.12f), new Vector2(940f, 190f), new Color(0f, 0f, 0f, 0f));
         castleUpgradeButton = CreateButton(upgradePanel.transform, "Castle Upgrade", new Vector2(0.2f, 0.5f), new Vector2(250f, 94f));
         holeUpgradeButton = CreateButton(upgradePanel.transform, "Hole Upgrade", new Vector2(0.5f, 0.5f), new Vector2(250f, 94f));
         towerBuildButton = CreateButton(upgradePanel.transform, "Build Tower", new Vector2(0.8f, 0.5f), new Vector2(250f, 94f));
